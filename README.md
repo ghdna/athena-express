@@ -12,7 +12,7 @@ athena-express makes it easier to execute SQL queries on Amazon Athena and retur
 
 It's lightweight (~4KB uncompressed) and has zero dependencies.
 
-
+Example:
 ![athena-express example](https://pbs.twimg.com/media/Dkne8s0U0AA4xwd.png)
 
 ## Motivation
