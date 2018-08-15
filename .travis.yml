@@ -5,8 +5,11 @@ node_js:
   - "8"
   - "7"
 
+before script:
+  - "npm install athena-express"
+
 before_install:
   - "npm install"
 
 script: 
-  - npm start
+  - npm startn

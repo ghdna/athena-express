@@ -1,5 +1,9 @@
 # Athena-Express: Simplify SQL queries on Amazon Athena
 
+[![NPM](https://nodei.co/npm/athena-express.png?compact=true)](https://nodei.co/npm/athena-express/)
+
+[![Build Status](https://travis-ci.org/ghdna/athena-express.svg?branch=master)](https://travis-ci.org/ghdna/athena-express)
+
 ## Synopsis
 
 Athena-Express makes it easier to execute SQL queries on Amazon Athena and returns the response in a neatly formatted JSON array.
@@ -34,14 +38,14 @@ athenaExpress.executeQuery("SELECT * FROM movies LIMIT 3");
 
 Athena-Express essentially bundles following steps as listed on the official [AWS Documentation](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html):
 
-1.  Start a query execution
-2.  Keep checking until the said query has finished executing
-3.  Fetch the results of said query execution from Amazon S3
+- Start a query execution
+- Keep checking until the said query has finished executing
+- Fetch the results of said query execution from Amazon S3
 
 And as an added bonus
 
-4.  Format the results into a clean, friendly JSON array
-5.  Handle Athena errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
+- Format the results into a clean, friendly JSON array
+- Handle Athena errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
 
 ## Prerequisites
 
