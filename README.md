@@ -21,11 +21,9 @@ athenaExpress.executeQuery("SELECT * FROM movies LIMIT 3");
 **Response:**
 
 ```javascript
-[
-	{ name: "Mission: Impossible Fallout", year: "2018" },
-	{ name: "Captain America: Civil War", year: "2016" },
-	{ name: "Star Wars: The Last Jedi", year: "2017" }
-];
+[{ name: "Mission: Impossible Fallout", year: "2018" },
+{ name: "Captain America: Civil War", year: "2016" },
+{ name: "Star Wars: The Last Jedi", year: "2017" }]
 ```
 
 ## Motivation
