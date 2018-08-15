@@ -13,7 +13,7 @@ athena-express makes it easier to execute SQL queries on Amazon Athena and retur
 It's lightweight (~4KB uncompressed) and has zero dependencies.
 
 
-![athena-express example](https://pbs.twimg.com/media/DknYVMWVAAIwgWy.png)
+![athena-express example](https://pbs.twimg.com/media/Dkne8s0U0AA4xwd.png)
 
 ## Motivation
 
@@ -121,10 +121,10 @@ Advance Config Parameters:
 
     ```javascript
     //So you can execute Athena queries simply by passing the SQL statement
-    athenaExpress.executeQuery("SELECT * FROM movies LIMIT 3");
+    athenaExpress.query("SELECT * FROM movies LIMIT 3");
 
     //Instead of SQL & DB object
-    athenaExpress.executeQuery({
+    athenaExpress.query({
     	sql: "SELECT * FROM movies LIMIT 3",
     	db: "moviedb"
     });
@@ -141,7 +141,7 @@ let query = {
 };
 
 athenaExpress
-	.executeQuery(query)
+	.query(query)
 	.then(results => {
 		console.log(results);
 	})
@@ -160,7 +160,7 @@ athenaExpress
 	};
 
 	try {
-		let results = await athenaExpress.executeQuery(query);
+		let results = await athenaExpress.query(query);
 		console.log(results);
 	} catch (error) {
 		console.log(error);
@@ -201,7 +201,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 	};
 
 	try {
-		let results = await athenaExpress.executeQuery(query);
+		let results = await athenaExpress.query(query);
 		console.log(results);
 	} catch (error) {
 		console.log(error);
@@ -237,7 +237,7 @@ exports.handler = async (event, context, callback) => {
 	};
 
 	try {
-		let results = await athenaExpress.executeQuery(query);
+		let results = await athenaExpress.query(query);
 		callback(null, results);
 	} catch (error) {
 		callback(error, null);
