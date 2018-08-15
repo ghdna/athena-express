@@ -1,3 +1,7 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=dd34219f9de2e5e7dcc84feb23e2992665a2f5e8319b857bb575ed6e40e88bf0
+
 language: "node_js"
 node_js:
   - "10"
@@ -7,12 +11,17 @@ node_js:
 
 before script:
   - "npm install athena-express"
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 
 before_install:
   - "npm install"
 
 script: 
   - npm start
+  - bundle exec rspec
 
 after_script:
   - npm run coveralls
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
