@@ -8,11 +8,12 @@
 
 ## Synopsis
 
-athena-express makes it easier to execute SQL queries on Amazon Athena and returns the response in a neatly formatted JSON array.
+athena-express makes it easier to execute SQL queries on Amazon Athena by chaining together a bunch of methods in the AWS SDK. This allows you to execute SQL queries **AND** fetch JSON results in the same synchronous call - well suited for web applications. 
+
 
 It's lightweight (~4KB uncompressed) and has zero dependencies.
 
-Example:
+##### Example:
 ![athena-express example](https://pbs.twimg.com/media/Dkne8s0U0AA4xwd.png)
 
 ## Motivation

@@ -1,6 +1,6 @@
 {
   "name": "athena-express",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Athena-Express makes it easier to execute SQL queries on Amazon Athena by consolidating & astracting several methods in the AWS SDK",
   "main": "./lib/index.js",
   "scripts": {
