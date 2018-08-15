@@ -1,0 +1,12 @@
+trlanguage: "node_js"
+node_js:
+  - "10"
+  - "9"
+  - "8"
+  - "7"
+
+before_install:
+  - "npm install"
+
+script: 
+  - npm start

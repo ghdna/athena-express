@@ -1,0 +1,37 @@
+{
+  "name": "athena-express",
+  "version": "0.0.1",
+  "description":
+    "Athena-Express makes it easier to execute SQL queries on Amazon Athena by consolidating & astracting several methods in the AWS SDK",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "node ./node_modules/mocha/bin/mocha",
+    "start": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghdna/athena-express.git"
+  },
+  "keywords": [
+    "aws",
+    "athena",
+    "amazon",
+    "amazon",
+    "web",
+    "services",
+    "sql",
+    "database"
+  ],
+  "author": "Gary Arora (https://twitter.com/AroraGary)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ghdna/athena-express/issues"
+  },
+  "homepage": "https://github.com/ghdna/athena-express#readme",
+  "devDependencies": {
+    "aws-sdk": "^2.291.0",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {}
+}
