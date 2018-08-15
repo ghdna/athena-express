@@ -149,8 +149,7 @@ Advance Config Parameters:
 
 ```javascript
 let query = {
-	sql:
-		"SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
+	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 	db: "sampledb" /* assumes 'default' database if not specified here  */
 };
 
@@ -169,8 +168,7 @@ athenaExpress
 ```javascript
 (async () => {
 	let query = {
-		sql:
-			"SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
+		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 		db: "sampledb" /* assumes 'default' database if not specified here  */
 	};
 
@@ -263,23 +261,21 @@ exports.handler = async (event, context, callback) => {
 ###### Results:
 
 ```javascript
-[
-	{
-		elb_name: "elb_demo_005",
-		request_port: "8222",
-		request_ip: "245.85.197.169"
-	},
-	{
-		elb_name: "elb_demo_003",
-		request_port: "24615",
-		request_ip: "251.165.102.100"
-	},
-	{
-		elb_name: "elb_demo_007",
-		request_port: "24251",
-		request_ip: "250.120.176.53"
-	}
-];
+[{
+	elb_name: "elb_demo_005",
+	request_port: "8222",
+	request_ip: "245.85.197.169"
+},
+{
+	elb_name: "elb_demo_003",
+	request_port: "24615",
+	request_ip: "251.165.102.100"
+},
+{
+	elb_name: "elb_demo_007",
+	request_port: "24251",
+	request_ip: "250.120.176.53"
+}]
 ```
 
 ## Contributors
