@@ -8,23 +8,12 @@
 
 ## Synopsis
 
-Athena-Express makes it easier to execute SQL queries on Amazon Athena and returns the response in a neatly formatted JSON array.
+athena-express makes it easier to execute SQL queries on Amazon Athena and returns the response in a neatly formatted JSON array.
 
 It's lightweight (~4KB uncompressed) and has zero dependencies.
 
-**Example:**
 
-```javascript
-athenaExpress.executeQuery("SELECT * FROM movies LIMIT 3");
-```
-
-**Response:**
-
-```javascript
-[{ name: "Mission: Impossible Fallout", year: "2018" },
-{ name: "Captain America: Civil War", year: "2016" },
-{ name: "Star Wars: The Last Jedi", year: "2017" }]
-```
+![athena-express example](https://pbs.twimg.com/media/DknYVMWVAAIwgWy.png)
 
 ## Motivation
 
@@ -34,9 +23,9 @@ athenaExpress.executeQuery("SELECT * FROM movies LIMIT 3");
 
 **Not So Good News** is that using Amazon Athena via the AWS' SDK requires too many moving parts to setup including the manual error handling.
 
-**Enter Athena-Express!**
+**Enter athena-express!**
 
-Athena-Express essentially bundles following steps as listed on the official [AWS Documentation](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html):
+athena-express essentially bundles following steps as listed on the official [AWS Documentation](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html):
 
 - Start a query execution
 - Keep checking until the said query has finished executing
@@ -51,7 +40,7 @@ And as an added bonus
 
 -   You will need an `IAM Role` (if executing from `AWS Lambda`) **OR** an `IAM User` with `accessKeyId` and `secretAccessKey`
 -   This IAM role/user must have at least `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached to its permissions
-    -   As an alternative to granting `AmazonS3FullAccess` you could granularize the policy to a specific bucket that you must specify during Athena-Express initialization
+    -   As an alternative to granting `AmazonS3FullAccess` you could granularize the policy to a specific bucket that you must specify during athena-express initialization
 
 ## Configuration & Initialization options
 
