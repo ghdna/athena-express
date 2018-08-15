@@ -12,4 +12,7 @@ before_install:
   - "npm install"
 
 script: 
-  - npm startn
+  - npm start
+
+after_script:
+  - npm run coveralls
