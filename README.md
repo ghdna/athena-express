@@ -43,7 +43,14 @@ And as an added bonus
 -   This IAM role/user must have at least `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached to its permissions
     -   As an alternative to granting `AmazonS3FullAccess` you could granularize the policy to a specific bucket that you must specify during athena-express initialization
 
-## Configuration & Initialization options
+## Configuration Options
+Athena-Express needs an AWS object (created with the relevant permissions) passed within the constructor so that it can trigger Athena SDK. It's up to you how you create this `aws` object. Few options: 
+- Create an aws object by explicitly passing in the `secretAccessKey` and `accessKeyId` as shown in the options below
+- OR Use [IAM roles](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) - when using Lambda - see full example below  
+- OR Use [instance profiles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) when using EC2s
+- OR Use [environment variables](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html)
+
+
 
 #### Zero config mode:
 
@@ -52,8 +59,7 @@ In zero config mode, AthenaExpress creates a new `S3 bucket` in your AWS account
 ```javascript
 const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk"),
-	awsCredentials = {
-		/* required */
+	awsCredentials = { /* required */
 		region: "STRING_VALUE",
 		accessKeyId: "STRING_VALUE",
 		secretAccessKey: "STRING_VALUE"
@@ -72,8 +78,7 @@ In minimal config mode, you specify an `S3 bucket` in your AWS account for Amazo
 ```javascript
 const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk"),
-	awsCredentials = {
-		/* required */
+	awsCredentials = { /* required */
 		region: "STRING_VALUE",
 		accessKeyId: "STRING_VALUE",
 		secretAccessKey: "STRING_VALUE"
@@ -81,10 +86,10 @@ const AthenaExpress = require("athena-express"),
 
 aws.config.update(awsCredentials);
 
-//AthenaExpress config object
+//AthenaExpress minimal config object
 const athenaExpressConfig = {
-	aws /* required */,
-	s3: "STRING_VALUE"
+	aws, /* required */
+	s3: "STRING_VALUE" /* optional */
 };
 
 //Initializing AthenaExpress with minimal configuration
@@ -100,13 +105,23 @@ Minimum Config Parameters:
 All config options
 
 ```javascript
-//AthenaExpress config object
+const AthenaExpress = require("athena-express"),
+	aws = require("aws-sdk"),
+	awsCredentials = { /* required */
+		region: "STRING_VALUE",
+		accessKeyId: "STRING_VALUE",
+		secretAccessKey: "STRING_VALUE"
+	};
+
+aws.config.update(awsCredentials);
+
+//AthenaExpress advance config object
 const athenaExpressConfig = {
-	aws /* required */,
-	s3: "STRING_VALUE",
-	formatJson: BOOLEAN,
-	retry: Integer,
-	db: "STRING_VALUE"
+	aws, /* required */
+	s3: "STRING_VALUE", /* optional */
+	formatJson: BOOLEAN, /* optional */
+	retry: Integer, /* optional */
+	db: "STRING_VALUE" /* optional */
 };
 
 //Initializing AthenaExpress with all configuration options
@@ -218,27 +233,23 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk");
 
-/* AWS Credentials are not required here 
-    /* but the IAM Role assumed by this Lambda 
-    /* must have the necessary permission to execute Athena queries 
+	/* AWS Credentials are not required here 
+    /* because the IAM Role assumed by this Lambda 
+    /* has the necessary permission to execute Athena queries 
     /* and store the result in Amazon S3 bucket */
 
+/* Specifying database here as part of athena express constructor */
 const athenaExpressConfig = {
 	aws,
-	s3: "s3://my-bucket-for-storing-athena-results-us-east-1"
+	db: "sampledb"
 };
-
-//Initializing AthenaExpress with minimal configuration
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 exports.handler = async (event, context, callback) => {
-	let query = {
-		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3",
-		db: "sampledb"
-	};
+	const sqlQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3";
 
 	try {
-		let results = await athenaExpress.query(query);
+		let results = await athenaExpress.query(sqlQuery);
 		callback(null, results);
 	} catch (error) {
 		callback(error, null);
