@@ -14,7 +14,7 @@ athena-express makes it easier to execute SQL queries on Amazon Athena by chaini
 It's lightweight (~4KB uncompressed) and has zero dependencies.
 
 ##### Example:
-![athena-express example](https://pbs.twimg.com/media/Dkne8s0U0AA4xwd.png)
+![athena-express example](https://image.ibb.co/mX1wTK/Screen_Shot_2018_08_22_at_8_34_47_PM.png)
 
 ## Motivation
 
@@ -36,6 +36,7 @@ And as an added bonus
 
 - Format the results into a clean, friendly JSON array
 - Handle Athena errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
+- Provides helpful stats including cost per query in USD
 
 ## Prerequisites
 
@@ -44,7 +45,7 @@ And as an added bonus
     -   As an alternative to granting `AmazonS3FullAccess` you could granularize the policy to a specific bucket that you must specify during athena-express initialization
 
 ## Configuration Options
-Athena-Express needs an AWS object (created with the relevant permissions) passed within the constructor so that it can trigger Athena SDK. It's up to you how you create this `aws` object. Few options: 
+Athena-Express needs an AWS SDK object (created with the relevant permissions) passed within the constructor so that it can trigger Athena SDK. It's up to you how you create this `aws` object. Few options: 
 - Create an aws object by explicitly passing in the `secretAccessKey` and `accessKeyId` as shown in the options below
 - OR Use [IAM roles](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) - when using Lambda - see full example below  
 - OR Use [instance profiles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) when using EC2s
@@ -52,14 +53,14 @@ Athena-Express needs an AWS object (created with the relevant permissions) passe
 
 
 
-#### Zero config mode:
+#### Simple Configuration
 
-In zero config mode, AthenaExpress creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
+Simple Configuration requires only the AWS SDK object to be passed as a parameter to initialize Athena Express. Default values are assumed for all other parameter options and AthenaExpress creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
 
 ```javascript
 const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk"),
-	awsCredentials = { /* required */
+	awsCredentials = { 
 		region: "STRING_VALUE",
 		accessKeyId: "STRING_VALUE",
 		secretAccessKey: "STRING_VALUE"
@@ -67,47 +68,24 @@ const AthenaExpress = require("athena-express"),
 
 aws.config.update(awsCredentials);
 
-//Initializing AthenaExpress with zero configuration
-const athenaExpress = new AthenaExpress({ aws });
-```
-
-#### Minimal config mode: (recommended)
-
-In minimal config mode, you specify an `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
-
-```javascript
-const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk"),
-	awsCredentials = { /* required */
-		region: "STRING_VALUE",
-		accessKeyId: "STRING_VALUE",
-		secretAccessKey: "STRING_VALUE"
-	};
-
-aws.config.update(awsCredentials);
-
-//AthenaExpress minimal config object
+//AthenaExpress config object
 const athenaExpressConfig = {
 	aws, /* required */
-	s3: "STRING_VALUE" /* optional */
 };
 
-//Initializing AthenaExpress with minimal configuration
+//Initializing AthenaExpress
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ```
 
-Minimum Config Parameters:
 
--   `s3` - (String) S3 bucket name/prefix you want created in your AWS account. e.g. `s3://my-bucket-us-east-1`
+#### Advance Configuration:
 
-#### Advance config mode:
-
-All config options
+All parameters 
 
 ```javascript
 const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk"),
-	awsCredentials = { /* required */
+	awsCredentials = { 
 		region: "STRING_VALUE",
 		accessKeyId: "STRING_VALUE",
 		secretAccessKey: "STRING_VALUE"
@@ -115,25 +93,24 @@ const AthenaExpress = require("athena-express"),
 
 aws.config.update(awsCredentials);
 
-//AthenaExpress advance config object
+//AthenaExpress config object
 const athenaExpressConfig = {
 	aws, /* required */
 	s3: "STRING_VALUE", /* optional */
-	formatJson: BOOLEAN, /* optional */
-	retry: Integer, /* optional */
-	db: "STRING_VALUE" /* optional */
+    db: "STRING_VALUE", /* optional */
+	formatJson: BOOLEAN, /* optional default=true */
+	retry: Integer, /* optional default=200 */
+    getStats: BOOLEAN /* optional default=false */
 };
 
-//Initializing AthenaExpress with all configuration options
+//Initializing AthenaExpress
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ```
 
 Advance Config Parameters:
 
--   `s3` - (String) S3 bucket name/prefix you want created in your AWS account
--   `formatJson` - (Boolean) default value is true. Override as false if you rather get the raw unformatted JSON from Athena
--   `retry` - (Integer) default value is 200 (milliseconds) of interval to keep checking if the specific Athena query has finished executing
--   `db` - (String) Set the Athena database name here to execute athena queries without needing to specify a `db` everytime during execution.
+-   `s3` - (String) S3 bucket name/prefix to store athena results
+-   `db` - (String) Set the Athena database name here to execute all succeeding athena queries.
 
     ```javascript
     //So you can execute Athena queries simply by passing the SQL statement
@@ -145,6 +122,24 @@ Advance Config Parameters:
     	db: "moviedb"
     });
     ```
+  -   `formatJson` - (Boolean default `true`) Override as false if you rather get the raw unformatted JSON from Athena. 
+-   `retry` - (Integer default `200` milliseconds) Interval between re-checking if the specific Athena query has finished executing
+-   `getStats` - (Boolean default `false`) Get stats for your query. These stats include data scanned in megabytes, athena execution time in milliseconds, item count, and query cost in USD based on the [Athena Pricing Documentation](https://aws.amazon.com/athena/pricing/). Example:
+```javascript
+{  
+	DataScannedInMB: 6,
+	QueryCostInUSD: 0.00004768,
+	EngineExecutionTimeInMillis: 2234,
+	Count: 5,
+   	Items: [  
+      {  
+         ...
+      },
+   ]
+}
+```
+
+
 
 ## Usage
 
@@ -153,7 +148,7 @@ Advance Config Parameters:
 ```javascript
 let query = {
 	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
-	db: "sampledb" /* assumes 'default' database if not specified here  */
+	db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 };
 
 athenaExpress
@@ -172,7 +167,7 @@ athenaExpress
 (async () => {
 	let query = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
-		db: "sampledb" /* assumes 'default' database if not specified here  */
+		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
 
 	try {
@@ -203,17 +198,17 @@ aws.config.update(awsCredentials);
 
 const athenaExpressConfig = {
 	aws,
-	s3: "s3://my-bucket-for-storing-athena-results-us-east-1"
+	s3: "s3://my-bucket-for-storing-athena-results-us-east-1",
+    getStats: true
 };
 
-//Initializing AthenaExpress with minimal configuration
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 //Invoking a query on Amazon Athena
 (async () => {
 	let query = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3",
-		db: "sampledb"
+		db: "sampledb" 
 	};
 
 	try {
@@ -238,10 +233,10 @@ const AthenaExpress = require("athena-express"),
     /* has the necessary permission to execute Athena queries 
     /* and store the result in Amazon S3 bucket */
 
-/* Specifying database here as part of athena express constructor */
 const athenaExpressConfig = {
 	aws,
-	db: "sampledb"
+	db: "sampledb",
+    getStats: true
 };
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
@@ -260,21 +255,26 @@ exports.handler = async (event, context, callback) => {
 ###### Results:
 
 ```javascript
-[{
-	elb_name: "elb_demo_005",
-	request_port: "8222",
-	request_ip: "245.85.197.169"
-},
-{
-	elb_name: "elb_demo_003",
-	request_port: "24615",
-	request_ip: "251.165.102.100"
-},
-{
-	elb_name: "elb_demo_007",
-	request_port: "24251",
-	request_ip: "250.120.176.53"
-}]
+{ Items:
+   [ { elb_name: 'elb_demo_002',
+       request_port: '26144',
+       request_ip: '240.220.175.143' },
+     { elb_name: 'elb_demo_008',
+       request_port: '25515',
+       request_ip: '244.189.63.245' },
+     { elb_name: 'elb_demo_008',
+       request_port: '26779',
+       request_ip: '249.110.119.93' },
+     { elb_name: 'elb_demo_005',
+       request_port: '2208',
+       request_ip: '243.70.142.250' },
+     { elb_name: 'elb_demo_006',
+       request_port: '11341',
+       request_ip: '245.231.42.125' } ],
+  DataScannedInMB: 3,
+  QueryCostInUSD: 0.00004768,
+  EngineExecutionTimeInMillis: 2172,
+  Count: 5 }
 ```
 
 ## Contributors
