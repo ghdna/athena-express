@@ -34,7 +34,7 @@ Amazon Athena combines the strength of Presto with serverless & self-managed cap
 2.	Keeps checking until the query has finished executing
 3.	Fetches the results of the query execution from Amazon S3
 
-And as an added feature
+And as added features
 
 4.	Formats the results into a clean, user-friendly JSON array
 5.	Handles errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
@@ -44,14 +44,12 @@ Integrating with Amazon Athena without `athena-express` would require you to ide
 
 `athena-express` can help you save time & effort in setting up this integration so that you can focus on core application development. 
 
-`athena-express` is lightweight (~4KB uncompressed) and has zero dependencies.
-
 
 ### How is Athena-Express being used?
 The most common use case is integrating a web front-end with Amazon Athena using `athena-express` as a backend. This backend could be a NodeJS application or a Lambda function. 
 
-Here is an example application architecture:
-![athena-express architecture](https://image.ibb.co/cLJ5vV/Picture1.png)
+Here is an example application architecture using Lambda function:
+![athena-express architecture](https://image.ibb.co/k3RpNA/Screen-Shot-2018-11-22-at-11-17-58-AM.png)
 
 This architecture has a web front-end that invokes an API endpoint hosted on Amazon API Gateway by passing a query request. The query request can be as simple as `SELECT * FROM movies LIMIT 3`
 
