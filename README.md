@@ -26,7 +26,7 @@ It's lightweight (~4KB uncompressed) and has zero dependencies.
 
 Amazon Athena combines the strength of Presto with serverless & self-managed capabilities of AWS. By simply pointing Athena to your data in Amazon S3, one could start querying using standard SQL. Most results are delivered within seconds and there’s no need for complex ETL jobs to prepare your data for analysis. This makes it easy for anyone with SQL skills to quickly analyze large-scale datasets.
 
-## How Athena-Express simplifies using Amazon Athena
+## How athena-express simplifies using Amazon Athena
 
 `athena-express` simplifies integrating Amazon Athena with any NodeJS application - running as standalone or as Lambda function. As a wrapper on AWS SDK, Athena-Express essentially bundles the following steps listed on the official [AWS Documentation](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html):
 
@@ -45,7 +45,7 @@ Integrating with Amazon Athena without `athena-express` would require you to ide
 `athena-express` can help you save time & effort in setting up this integration so that you can focus on core application development. 
 
 
-### How is Athena-Express being used?
+### How is athena-express being used?
 The most common use case is integrating a web front-end with Amazon Athena using `athena-express` as a backend. This backend could be a NodeJS application or a Lambda function. 
 
 Here is an example application architecture using Lambda function:
