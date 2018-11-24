@@ -49,7 +49,7 @@ Integrating with Amazon Athena without `athena-express` would require you to ide
 The most common use case is integrating a web front-end with Amazon Athena using athena-express as a backend. This backend could be any Node.JS application including Lambda functions.
 
 Here is an example application architecture with a Lambda function: 
-![athena-express architecture](https://image.ibb.co/k3RpNA/Screen-Shot-2018-11-22-at-11-17-58-AM.png)
+<img src="https://image.ibb.co/k3RpNA/Screen-Shot-2018-11-22-at-11-17-58-AM.pngg" alt="athena-express architecture" width="700">
 
 This architecture has a web front-end that invokes an API endpoint hosted on Amazon API Gateway by passing a query request. The query request can be as simple as `SELECT * FROM movies LIMIT 3`
 
