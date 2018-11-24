@@ -294,7 +294,7 @@ exports.handler = async (event, context, callback) => {
 ```
 
 ###### Results:
-![athena-express results](https://image.ibb.co/fpARNA/carbon-2.png)
+<img src="https://image.ibb.co/fpARNA/carbon-2.png" width="400">
 
 ## Contributors
 
