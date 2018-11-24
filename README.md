@@ -14,7 +14,7 @@
 It's lightweight (~4KB uncompressed) and has zero dependencies.
 
 ##### Example:
-![athena-express example](https://image.ibb.co/mX1wTK/Screen_Shot_2018_08_22_at_8_34_47_PM.png)
+![athena-express example](https://image.ibb.co/cWNvFV/carbon-1.png)
 
 
 
@@ -294,7 +294,7 @@ exports.handler = async (event, context, callback) => {
 ```
 
 ###### Results:
-![athena-express results](https://image.ibb.co/hA5RNA/Screen-Shot-2018-11-23-at-6-41-17-PM.png)
+![athena-express results](https://image.ibb.co/fpARNA/carbon-2.png)
 
 ## Contributors
 
