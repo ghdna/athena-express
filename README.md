@@ -28,7 +28,7 @@ Amazon Athena combines the strength of Presto with serverless & self-managed cap
 
 ## How athena-express simplifies using Amazon Athena
 
-`athena-express` simplifies integrating Amazon Athena with any NodeJS application - running as standalone or as Lambda function. As a wrapper on AWS SDK, Athena-Express essentially bundles the following steps listed on the official [AWS Documentation](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html):
+`athena-express` simplifies integrating Amazon Athena with any Node.JS application - running as a standalone application or as a Lambda function. As a wrapper on AWS SDK, Athena-Express  bundles the following steps listed on the official [AWS Documentation](https://docs.aws.amazon.com/athena/latest/APIReference/Welcome.html):
 
 1.	Initiates a query execution
 2.	Keeps checking until the query has finished executing
@@ -46,14 +46,14 @@ Integrating with Amazon Athena without `athena-express` would require you to ide
 
 
 ### How is athena-express being used?
-The most common use case is integrating a web front-end with Amazon Athena using `athena-express` as a backend. This backend could be a NodeJS application or a Lambda function. 
+The most common use case is integrating a web front-end with Amazon Athena using athena-express as a backend. This backend could be any Node.JS application including Lambda functions.
 
-Here is an example application architecture using Lambda function:
+Here is an example application architecture with a Lambda function: 
 ![athena-express architecture](https://image.ibb.co/k3RpNA/Screen-Shot-2018-11-22-at-11-17-58-AM.png)
 
 This architecture has a web front-end that invokes an API endpoint hosted on Amazon API Gateway by passing a query request. The query request can be as simple as `SELECT * FROM movies LIMIT 3`
 
-This API Gateway then triggers a Lambda function that has the `athena-express` library to execute queries in Amazon Athena. 
+This API Gateway then triggers a Lambda function that has the `athena-express` library imported. 
 
 
 ## Setup
@@ -64,7 +64,7 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 -   This IAM role/user must have `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached 
     -   Note: As an alternative to granting `AmazonS3FullAccess` you could granularize and limit write access to a specific `bucket` that you must specify during `athena-express` initialization
 
-### Configuration Options
+### Configuration
 - `athena-express` needs an AWS SDK object created with relevant permissions as mentioned in the prerequisites above.
 - This AWS object is passed within the constructor so that it can invoke Amazon Athena SDK. It's up to you how you create this `aws` object. Here are few options: 
 	1. Create an `aws` object by explicitly passing in the `accessKeyId` and `secretAccessKey` generated in prerequisites
@@ -80,7 +80,7 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
     const athenaExpressConfig = { aws }; //configuring athena-express with aws sdk object
     const athenaExpress = new AthenaExpress(athenaExpressConfig);
 	```
-	2. OR Use [IAM roles](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) - when using AWS Lambda Function
+	2. OR if using Lambda, provide an [IAM execution role](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) with `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached
  	```javascript 
     const aws = require("aws-sdk");
 	const athenaExpressConfig = { aws }; //configuring athena-express with aws sdk object
@@ -91,7 +91,7 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 
 
 
-#### Simple configuration option
+#### Option 1: Simple configuration
 
 - Simple configuration requires only the AWS SDK object to be passed as a parameter to initialize `athena-express`
 - Default values are assumed for all parameter options and `athena-express` creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
@@ -117,7 +117,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ```
 
 
-#### Advance configuration option
+#### Option 2: Advance configuration
 
 - Advance configuration specifies all parameters. 
 - You can pick and choose any of the optional parameters below
@@ -294,29 +294,7 @@ exports.handler = async (event, context, callback) => {
 ```
 
 ###### Results:
-
-```javascript
-{ Items:
-   [ { elb_name: 'elb_demo_002',
-       request_port: '26144',
-       request_ip: '240.220.175.143' },
-     { elb_name: 'elb_demo_008',
-       request_port: '25515',
-       request_ip: '244.189.63.245' },
-     { elb_name: 'elb_demo_008',
-       request_port: '26779',
-       request_ip: '249.110.119.93' },
-     { elb_name: 'elb_demo_005',
-       request_port: '2208',
-       request_ip: '243.70.142.250' },
-     { elb_name: 'elb_demo_006',
-       request_port: '11341',
-       request_ip: '245.231.42.125' } ],
-  DataScannedInMB: 3,
-  QueryCostInUSD: 0.00004768,
-  EngineExecutionTimeInMillis: 2172,
-  Count: 5 }
-```
+![athena-express results](https://image.ibb.co/hA5RNA/Screen-Shot-2018-11-23-at-6-41-17-PM.png)
 
 ## Contributors
 
