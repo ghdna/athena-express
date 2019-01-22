@@ -1,4 +1,4 @@
-# Athena-Express: Simplifying SQL queries on Amazon Athena
+# New Document# Athena-Express: Simplifying SQL queries on Amazon Athena
 
 [![NPM](https://nodei.co/npm/athena-express.png?compact=true)](https://nodei.co/npm/athena-express/)
 
@@ -297,6 +297,19 @@ exports.handler = async (event, context, callback) => {
 ###### Results:
 
 <img src="https://image.ibb.co/fpARNA/carbon-2.png" alt="Athena-Express result" width="400">
+
+## More Examples
+###### UTILITY queries - Added in v3.0
+ ```javascript
+ const results = await athenaExpress.query("SHOW TABLES");
+console.log(results);
+
+//Output:
+{ Items:
+   [ { row: 'default' },
+     { row: 'sampledb' } ] }
+   ```
+
 
 ## Contributors
 
