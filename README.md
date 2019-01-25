@@ -249,8 +249,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 (async () => {
 	let query = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3",
-		db: "sampledb",
-		getStats: true 
+		db: "sampledb"
 	};
 
 	try {
