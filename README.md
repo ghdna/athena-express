@@ -299,7 +299,8 @@ exports.handler = async (event, context, callback) => {
 <img src="https://image.ibb.co/fpARNA/carbon-2.png" alt="Athena-Express result" width="400">
 
 ## More Examples
-###### UTILITY queries - Added in v3.0
+##### UTILITY queries - Added in v3.0
+###### Show Tables (single column result)
  ```javascript
  const results = await athenaExpress.query("SHOW TABLES");
 console.log(results);
@@ -310,6 +311,34 @@ console.log(results);
      { row: 'sampledb' } ] }
    ```
 
+###### Describe Table (dual column result)
+
+ ```javascript
+ const results = await athenaExpress.query("DESCRIBE elb_logs");
+console.log(results);
+
+//Output:
+{ Items:
+   [ { request_timestamp: 'string' },
+     { elb_name: 'string' },
+     { request_ip: 'string' },
+     { request_port: 'int' },
+     { backend_ip: 'string' },
+     { backend_port: 'int' },
+     { request_processing_time: 'double' },
+     { backend_processing_time: 'double' },
+     { client_response_time: 'double' },
+     { elb_response_code: 'string' },
+     { backend_response_code: 'string' },
+     { received_bytes: 'bigint' },
+     { sent_bytes: 'bigint' },
+     { request_verb: 'string' },
+     { url: 'string' },
+     { protocol: 'string' },
+     { user_agent: 'string' },
+     { ssl_cipher: 'string' },
+     { ssl_protocol: 'string' } ] }
+   ```
 
 ## Contributors
 
