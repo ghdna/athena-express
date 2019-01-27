@@ -136,7 +136,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 | Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- |
 | `s3` | string  | `athena-express` creates a new bucket for you  | S3 bucket name/prefix to store Athena query results  |
-| `db`  | string  |  `default`  |  Athena database name that the SQL queries should be executed in.  |
+| `db`  | string  |  `default`  | Athena database name that the SQL queries should be executed in.  |
 
 
 
