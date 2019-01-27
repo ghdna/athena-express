@@ -203,7 +203,7 @@ aws.config.update(awsCredentials);
 const athenaExpressConfig = {
 	aws,
 	s3: "s3://my-bucket-for-storing-athena-results-us-east-1",
-    getStats: true
+	getStats: true
 };
 
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
