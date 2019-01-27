@@ -1,4 +1,4 @@
-# New Document# Athena-Express: Simplifying SQL queries on Amazon Athena
+# Athena-Express: Simplifying SQL queries on Amazon Athena
 
 [![NPM](https://nodei.co/npm/athena-express.png?compact=true)](https://nodei.co/npm/athena-express/)
 
