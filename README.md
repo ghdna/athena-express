@@ -7,12 +7,14 @@
 [![Coverage Status](https://coveralls.io/repos/github/ghdna/athena-express/badge.svg?branch=master)](https://coveralls.io/github/ghdna/athena-express?branch=master)
 [![Downloads](https://img.shields.io/npm/dt/athena-express.svg)](https://www.npmjs.com/package/athena-express)
 
+###### _As published on the official [AWS Partner Network Blog](https://aws.amazon.com/blogs/apn/using-athena-express-to-simplify-sql-queries-on-amazon-athena/)_
+
 ## Synopsis
 
-`athena-express` can simplify executing SQL queries in Amazon Athena **AND** fetch the JSON results in the same synchronous call - well suited for web applications. 
+Athena-Express can simplify executing SQL queries in Amazon Athena **AND** fetching _cleaned-up_ JSON results in the same synchronous call - well suited for web applications. 
 
 
-It's lightweight (~4KB uncompressed) and has zero dependencies.
+It's lightweight and has zero external dependencies.
 
 ##### Example:
 <img src="https://image.ibb.co/cWNvFV/carbon-1.png" alt="Athena-Express Example" width="700">
@@ -38,7 +40,7 @@ Amazon Athena combines the strength of Presto with serverless & self-managed cap
 And as added features
 
 4.	Formats the results into a clean, user-friendly JSON array
-5.	Handles errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
+5.	Handles specific Athena errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
 6.	Provides optional helpful stats including cost per query in USD
 
 Integrating with Amazon Athena without `athena-express` would require you to identify the appropriate API methods in the AWS SDK, stich them together sequentially, and then build out an error handling & retry mechanism for each of those methods. 
@@ -47,9 +49,9 @@ Integrating with Amazon Athena without `athena-express` would require you to ide
 
 
 ### How is athena-express being used?
-The most common use case is integrating a web front-end with Amazon Athena using athena-express as a backend. This backend could be any Node.JS application including Lambda functions.
+The most common use case is integrating a web front-end with Amazon Athena using `athena-express` as a backend. This backend could be any Node.JS application including AWS Lambda.
 
-Here is an example application architecture with a Lambda function: 
+Here is an example using AWS Lambda: 
 <img src="https://image.ibb.co/k3RpNA/Screen-Shot-2018-11-22-at-11-17-58-AM.pngg" alt="athena-express architecture" width="700">
 
 This architecture has a web front-end that invokes an API endpoint hosted on Amazon API Gateway by passing a query request. The query request can be as simple as `SELECT * FROM movies LIMIT 3`
@@ -61,13 +63,13 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 
 ### Prerequisites
 
--   You will need an `IAM Role` (if using `AWS Lambda` or `AWS EC2`) **OR** an `IAM User` with `accessKeyId` and `secretAccessKey` if using a standalone NodeJS application
+-   You will need either an `IAM Role` (if you're running `athena-express` on AWS Lambda or AWS EC2) **OR** an `IAM User` with `accessKeyId` and `secretAccessKey` (if you're running `athena-express` on a standalone NodeJS application)
 -   This IAM role/user must have `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached 
-    -   Note: As an alternative to granting `AmazonS3FullAccess` you could granularize and limit write access to a specific `bucket` that you must specify during `athena-express` initialization
+    -   Note: As an alternative to granting `AmazonS3FullAccess` you could granularize and limit write access to a specific `bucket`. Just specify this bucket name during `athena-express` initialization
 
 ### Configuration
 - `athena-express` needs an AWS SDK object created with relevant permissions as mentioned in the prerequisites above.
-- This AWS object is passed within the constructor so that it can invoke Amazon Athena SDK. It's up to you how you create this `aws` object. Here are few options: 
+- This AWS object is passed within the constructor so that it can invoke Amazon Athena SDK. It's up to you how you create this `aws` object. Here are 4 options: 
 	1. Create an `aws` object by explicitly passing in the `accessKeyId` and `secretAccessKey` generated in prerequisites
 	```javascript 
     const aws = require("aws-sdk");
@@ -98,16 +100,6 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 - Default values are assumed for all parameter options and `athena-express` creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
 
 ```javascript
-const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk"),
-	awsCredentials = { 
-		region: "STRING_VALUE",
-		accessKeyId: "STRING_VALUE",
-		secretAccessKey: "STRING_VALUE"
-	};
-
-aws.config.update(awsCredentials);
-
 //configuring athena-express with aws sdk object
 const athenaExpressConfig = {
 	aws, /* required */
@@ -120,20 +112,11 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 #### Option 2: Advance configuration
 
-- Advance configuration specifies all parameters. 
-- You can pick and choose any of the optional parameters below
+- Besides the `aws` sdk paramater that is required, you can add any of the following optional parameters below
+
+
 
 ```javascript
-const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk"),
-	awsCredentials = { 
-		region: "STRING_VALUE",
-		accessKeyId: "STRING_VALUE",
-		secretAccessKey: "STRING_VALUE"
-	};
-
-aws.config.update(awsCredentials);
-
 //AthenaExpress config object
 const athenaExpressConfig = {
 	aws, /* required */
@@ -149,36 +132,15 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ```
 
 Advance config Parameters:
+| Parameter  | Format | Default Value | Description|
+| ------------- | ------------- | ------------- | ------------- 
+| `s3`  | string | `athena-express` creates a new bucket for you |  S3 bucket name/prefix to store Athena query results 
+| `db`  | string | `default`| Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. ` athenaExpress.query("SELECT * FROM movies LIMIT 3")` as opposed to ` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`
+|`formatJson`  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. 
+|`retry`  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing
+|`getStats`  | boolean | `false`| Get stats for your query including data scanned in megabytes, athena execution time in milliseconds, item count, and query cost in USD based on the [Athena Pricing Documentation](https://aws.amazon.com/athena/pricing/). e.g.` {DataScannedInMB: 6, QueryCostInUSD: 0.00004768, EngineExecutionTimeInMillis: 2234, Count: 5,...`
 
--   `s3` - (String) S3 bucket name/prefix to store Athena query results
--   `db` - (String) Athena database that the SQL queries will be executed in
 
-    ```javascript
-    //So you can execute Athena queries simply by passing the SQL statement
-    athenaExpress.query("SELECT * FROM movies LIMIT 3");
-
-    //Instead of specifying the DB name in every query
-    athenaExpress.query({
-    	sql: "SELECT * FROM movies LIMIT 3",
-    	db: "moviedb"
-    });
-    ```
-  -   `formatJson` - (Boolean default `true`) Override as false if you rather get the raw unformatted JSON from Athena. 
--   `retry` - (Integer default `200` milliseconds) Interval between re-checking if the specific Athena query has finished executing
--   `getStats` - (Boolean default `false`) Get stats for your query. These stats include data scanned in megabytes, athena execution time in milliseconds, item count, and query cost in USD based on the [Athena Pricing Documentation](https://aws.amazon.com/athena/pricing/). Example:
-```javascript
-{  
-	DataScannedInMB: 6,
-	QueryCostInUSD: 0.00004768,
-	EngineExecutionTimeInMillis: 2234,
-	Count: 5,
-   	Items: [  
-      {  
-         ...
-      },
-   ]
-}
-```
 
 
 
