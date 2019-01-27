@@ -134,7 +134,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ###### Advance config Parameters:
 
 | Parameter  | Format | Default Value | Description |
-| ------------- | ------------- | ------------- |
+| ------------- | ------------- | ------------- | ------------- |
 | `s3` | string  | `athena-express` creates a new bucket for you  | S3 bucket  |
 
 
