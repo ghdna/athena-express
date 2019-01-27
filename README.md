@@ -100,10 +100,9 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 - Default values are assumed for all parameter options and `athena-express` creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
 
 ```javascript
-//configuring athena-express with aws sdk object
-const athenaExpressConfig = {
-	aws, /* required */
-};
+const aws = require("aws-sdk");
+
+const athenaExpressConfig = { aws }; //simple configuration with just an aws sdk object
 
 //Initializing athena-express
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
@@ -117,7 +116,9 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 
 ```javascript
-//AthenaExpress config object
+const aws = require("aws-sdk");
+
+//Advance configuration with all options
 const athenaExpressConfig = {
 	aws, /* required */
 	s3: "STRING_VALUE", /* optional */
