@@ -74,9 +74,9 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 	```javascript 
     const aws = require("aws-sdk");
     const awsCredentials = {
-        region: "us-east-1",
-        accessKeyId: "AKIAIHV5B6DGMEXVCXGA",
-        secretAccessKey: "SWSDdQr/0skiHB9AApy1iCDuiJVEo/gJzlranDKY"
+        region: "YOUR_AWS_REGION",
+		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
+		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
     };
     aws.config.update(awsCredentials);
 
@@ -122,10 +122,10 @@ const aws = require("aws-sdk");
 const athenaExpressConfig = {
 	aws, /* required */
 	s3: "STRING_VALUE", /* optional */
- 	db: "STRING_VALUE", /* optional */
+	db: "STRING_VALUE", /* optional */
 	formatJson: BOOLEAN, /* optional default=true */
 	retry: Integer, /* optional default=200 */
- 	getStats: BOOLEAN /* optional default=false */
+	getStats: BOOLEAN /* optional default=false */
 };
 
 //Initializing AthenaExpress
