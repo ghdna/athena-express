@@ -133,10 +133,10 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 ###### Advance config Parameters:
 
-| Parameter  | Format |
-| ------------- | ------------- |
-| `s3` | string  |
-| `db`  | string  |
+| Parameter  | Format | Default Value |
+| ------------- | ------------- | ------------- |
+| `s3` | string  | `athena-express` creates a new bucket for you  |
+| `db`  | string  |  `default`  |
 
 
 
