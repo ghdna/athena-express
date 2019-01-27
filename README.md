@@ -121,10 +121,10 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 const athenaExpressConfig = {
 	aws, /* required */
 	s3: "STRING_VALUE", /* optional */
-    db: "STRING_VALUE", /* optional */
+ 	db: "STRING_VALUE", /* optional */
 	formatJson: BOOLEAN, /* optional default=true */
 	retry: Integer, /* optional default=200 */
-    getStats: BOOLEAN /* optional default=false */
+ 	getStats: BOOLEAN /* optional default=false */
 };
 
 //Initializing AthenaExpress
@@ -240,7 +240,7 @@ const AthenaExpress = require("athena-express"),
 const athenaExpressConfig = {
 	aws,
 	db: "sampledb",
-	getStats: true
+ 	getStats: true
 };
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
