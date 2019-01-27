@@ -194,7 +194,7 @@ athenaExpress
 const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk"),
 	awsCredentials = {
-		region: "us-east-1",
+		region: "YOUR_AWS_REGION",
 		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
 		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
 	};
