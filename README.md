@@ -240,7 +240,7 @@ const AthenaExpress = require("athena-express"),
 const athenaExpressConfig = {
 	aws,
 	db: "sampledb",
- 	getStats: true
+	getStats: true
 };
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
