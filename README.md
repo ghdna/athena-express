@@ -133,10 +133,10 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 ###### Advance config Parameters:
 
-| Parameter  | Format | Default Value |
+| Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- |
-| `s3` | string  | `athena-express` creates a new bucket for you  |
-| `db`  | string  |  `default`  |
+| `s3` | string  | `athena-express` creates a new bucket for you  | S3 bucket name/prefix to store Athena query results  |
+| `db`  | string  |  `default`  |  Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. ` athenaExpress.query("SELECT * FROM movies LIMIT 3")` as opposed to ` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
 
 
 
