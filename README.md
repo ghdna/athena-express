@@ -124,7 +124,7 @@ const athenaExpressConfig = {
 	formatJson: BOOLEAN, /* optional default=true */
 	retry: Integer, /* optional default=200 */
 	getStats: BOOLEAN /* optional default=false */
-    ignoreEmpty: BOOLEAN /* optional default=true */
+	ignoreEmpty: BOOLEAN /* optional default=true */
 };
 
 //Initializing AthenaExpress
