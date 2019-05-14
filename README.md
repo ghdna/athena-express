@@ -125,10 +125,7 @@ const athenaExpressConfig = {
 	retry: Integer, /* optional default=200 */
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
-	encryption: OBJECT, /* optional */
-        KmsKey: process.env.kmskey
-    }
-	
+	encryption: OBJECT /* optional */
 };
 
 //Initializing AthenaExpress
@@ -145,7 +142,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 |retry  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing |
 |getStats | boolean | `false`| Get stats for your query including data scanned in megabytes, athena execution time in milliseconds, item count, and query cost in USD based on the [Athena Pricing Documentation](https://aws.amazon.com/athena/pricing/). e.g.` {DataScannedInMB: 6, QueryCostInUSD: 0.00004768, EngineExecutionTimeInMillis: 2234, Count: 5,...` |
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
-|encryption | object | not placed into configuration | This is the EncryptionConfiguation object which is optional in the ResultConfiguration. e.g. ` {EncryptionOption: 'SSE_KMS',KmsKey: process.env.kmskey} |
+|encryption | object | Not included | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: `{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
 
 ## Usage: Invoking athena-express
 
