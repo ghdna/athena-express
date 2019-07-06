@@ -138,12 +138,12 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 | Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- | ------------- |
 | s3 | string  | `athena-express` creates a new bucket for you  | S3 bucket name/prefix to store Athena query results  |
-| db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. ` athenaExpress.query("SELECT * FROM movies LIMIT 3")` as opposed to ` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
+| db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |
 |retry  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing |
-|getStats | boolean | `false`| Get stats for your query including data scanned in megabytes, athena execution time in milliseconds, item count, and query cost in USD based on the [Athena Pricing Documentation](https://aws.amazon.com/athena/pricing/). e.g.` {DataScannedInMB: 6, QueryCostInUSD: 0.00004768, EngineExecutionTimeInMillis: 2234, Count: 5,...` |
+|getStats | boolean | `false`| Get stats & additional metadata for your query, such as: <ul><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`EngineExecutionTimeInMillis`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
-|encryption | object | Not included | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: `{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
+|encryption | object | Not included | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
 
 ## Usage: Invoking athena-express
 
