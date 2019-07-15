@@ -10,7 +10,7 @@ chai.should();
 const THROW_IN_STARRTQUERYEXECUTION = 'startQueryExecution';
 const THROW_IN_GETQUERYEXECUTIOIN = 'getQueryExecution';
 
-const S3 = class S3 {
+class S3 {
   getObject(params) {
     return {
       createReadStream: () => {
@@ -20,9 +20,9 @@ const S3 = class S3 {
       }
     };
   }
-};
+}
 
-const Athena = class Athena {
+class Athena {
   constructor() {
     this.attempts = {
       startQueryExecution: 0,
@@ -106,7 +106,7 @@ const Athena = class Athena {
       }
     };
   }
-};
+}
 
 const getAthenaConfig = () => {
   return {
@@ -133,16 +133,21 @@ describe('AthenaExpress Tests', () => {
     it('should not have aws object undefined', function() {
       expect(function() {
         // eslint-disable-next-line no-new
-        new AthenaExpress({});
+        new AthenaExpress({ s3: {} });
+      }).to.throw(TypeError, 'AWS object not present or incorrect in the constructor');
+    });
+
+    it('should not have aws object without an Athena constructor inside of it', function() {
+      expect(function() {
+        // eslint-disable-next-line no-new
+        new AthenaExpress({ aws: {} });
       }).to.throw(TypeError, 'AWS object not present or incorrect in the constructor');
     });
 
     it('should fail when s3 bucket is not defined and the aws credentials.accessKeyId is undefined', function() {
       expect(function() {
         // eslint-disable-next-line no-new
-        new AthenaExpress({
-          aws: { config: { credentials: { accessKeyId: undefined } } }
-        });
+        new AthenaExpress({ aws: { config: { credentials: { accessKeyId: undefined } } } });
       }).to.throw(TypeError, 'AWS object not present or incorrect in the constructor');
     });
   });

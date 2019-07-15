@@ -7,7 +7,6 @@
     "test": "run-s test:* ",
     "test:unit": "cross-env NODE_ENV=test mocha test",
     "debug:unit": "NODE_ENV=test mocha test --inspect-brk --nolazy",
-    "test-coverage": "nyc --reporter=lcov --reporter=text npm test && nyc check-coverage --statements 95 --functions 95 --branches 85 --lines 95",
     "coveralls": "nyc --reporter=lcov --reporter=text npm test && nyc check-coverage --statements 95 --functions 95 --branches 85 --lines 95",
     "start": "npm test"
   },
