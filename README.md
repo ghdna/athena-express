@@ -150,13 +150,13 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ###### Using Promises:
 
 ```javascript
-let query = {
+let myQuery = {
 	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 	db: "sampledb" /* optional. You could specify a database here or in the advance configuration option mentioned above*/
 };
 
 athenaExpress
-	.query(query)
+	.query(myQuery)
 	.then(results => {
 		console.log(results);
 	})
@@ -169,13 +169,13 @@ athenaExpress
 
 ```javascript
 (async () => {
-	let query = {
+	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
 
 	try {
-		let results = await athenaExpress.query(query);
+		let results = await athenaExpress.query(myQuery);
 		console.log(results);
 	} catch (error) {
 		console.log(error);
@@ -183,9 +183,9 @@ athenaExpress
 })();
 ```
 
-## Full Example
+## Full Examples
 
-###### Using standard NodeJS application
+###### Using a standalone NodeJS application
 
 ```javascript
 "use strict";
@@ -210,13 +210,13 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 //Invoking a query on Amazon Athena
 (async () => {
-	let query = {
+	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3",
 		db: "sampledb"
 	};
 
 	try {
-		let results = await athenaExpress.query(query);
+		let results = await athenaExpress.query(myQuery);
 		console.log(results);
 	} catch (error) {
 		console.log(error);
@@ -233,9 +233,10 @@ const AthenaExpress = require("athena-express"),
 	aws = require("aws-sdk");
 
 	/* AWS Credentials are not required here 
-    /* because the IAM Role assumed by this Lambda 
+    /* Make sure the IAM Execution Role used by this Lambda 
     /* has the necessary permission to execute Athena queries 
-    /* and store the result in Amazon S3 bucket */
+    /* and store the result in Amazon S3 bucket
+    /* See configuration section above under Setup for more info */
 
 const athenaExpressConfig = {
 	aws,
@@ -244,14 +245,14 @@ const athenaExpressConfig = {
 };
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
-exports.handler = async (event, context, callback) => {
+exports.handler = async event => {
 	const sqlQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3";
 
 	try {
 		let results = await athenaExpress.query(sqlQuery);
-		callback(null, results);
+		return results;
 	} catch (error) {
-		callback(error, null);
+		return error;
 	}
 };
 ```
