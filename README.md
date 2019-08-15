@@ -127,6 +127,7 @@ const athenaExpressConfig = {
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
 	encryption: OBJECT /* optional */
+    skipResults: BOOLEAN /* optional default=false */
 };
 
 //Initializing AthenaExpress
@@ -141,9 +142,10 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 | db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |
 |retry  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing |
-|getStats | boolean | `false`| Get stats & additional metadata for your query, such as: <ul><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`EngineExecutionTimeInMillis`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
+|getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`EngineExecutionTimeInMillis`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
-|encryption | object | Not included | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
+|encryption | object | -- | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
+|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />Best used with a combination of `getStats : true` so that the `QueryExecutionId` & `S3Location` can be captured for later reference.   |
 
 ## Usage: Invoking athena-express
 
