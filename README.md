@@ -128,6 +128,7 @@ const athenaExpressConfig = {
 	ignoreEmpty: BOOLEAN, /* optional default=true */
 	encryption: OBJECT /* optional */
     skipResults: BOOLEAN /* optional default=false */
+    waitForResults: BOOLEAN /* optional default=true */
 };
 
 //Initializing AthenaExpress
@@ -146,6 +147,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
 |encryption | object | -- | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
 |skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />Best used with a combination of `getStats : true` so that the `QueryExecutionId` & `S3Location` can be captured for later reference.   |
+|waitForResults | boolean | `true` | Used to avoid waiting for the query completion when running the query method. Only the `QueryExecutionId` will be returned for later reference.   |
 
 ## Usage: Invoking athena-express
 
@@ -178,6 +180,27 @@ athenaExpress
 
 	try {
 		let results = await athenaExpress.query(myQuery);
+		console.log(results);
+	} catch (error) {
+		console.log(error);
+	}
+})();
+```
+
+###### Overriding query config:
+
+```javascript
+(async () => {
+	let myQuery = {
+		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
+		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
+	};
+    const customConfig = {
+        waitForResults: true
+    };
+
+	try {
+		let results = await athenaExpress.query(myQuery, customConfig);
 		console.log(results);
 	} catch (error) {
 		console.log(error);
