@@ -125,8 +125,8 @@ const athenaExpressConfig = {
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
 	encryption: OBJECT, /* optional */
-    skipResults: BOOLEAN, /* optional default=false */
-    waitForResults: BOOLEAN /* optional default=true */
+	skipResults: BOOLEAN, /* optional default=false */
+	waitForResults: BOOLEAN /* optional default=true */
 };
 
 //Initializing AthenaExpress
