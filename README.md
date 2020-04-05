@@ -122,6 +122,7 @@ const athenaExpressConfig = {
 	aws, /* required */
 	s3: "STRING_VALUE", /* optional */
 	db: "STRING_VALUE", /* optional */
+	workgroup: "STRING_VALUE", /* optional */
 	formatJson: BOOLEAN, /* optional default=true */
 	retry: Integer, /* optional default=200 */
 	getStats: BOOLEAN, /* optional default=false */
@@ -140,6 +141,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 | ------------- | ------------- | ------------- | ------------- |
 | s3 | string  | `athena-express` creates a new bucket for you  | S3 bucket name/prefix to store Athena query results  |
 | db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
+| workgroup | string  | `primary`  | Workgroup name |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |
 |retry  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing |
 |getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`EngineExecutionTimeInMillis`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
