@@ -155,7 +155,8 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 ```javascript
 let myQuery = {
-	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
+	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?" /* required */,
+	queryParams: [3],
 	db: "sampledb" /* optional. You could specify a database here or in the advance configuration option mentioned above*/
 };
 
@@ -174,7 +175,8 @@ athenaExpress
 ```javascript
 (async () => {
 	let myQuery = {
-		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
+		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?" /* required */,
+		queryParams: [3],
 		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
 
@@ -215,7 +217,8 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 //Invoking a query on Amazon Athena
 (async () => {
 	let myQuery = {
-		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3",
+		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?",
+		queryParams: [3],
 		db: "sampledb"
 	};
 
@@ -250,10 +253,10 @@ const athenaExpressConfig = {
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 exports.handler = async event => {
-	const sqlQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3";
+	const sqlQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?";
 
 	try {
-		let results = await athenaExpress.query(sqlQuery);
+		let results = await athenaExpress.query(sqlQuery, [3]);
 		return results;
 	} catch (error) {
 		return error;
