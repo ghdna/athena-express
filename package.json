@@ -1,6 +1,6 @@
 {
   "name": "athena-express",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "description": "Athena-Express makes it easier to execute SQL queries on Amazon Athena by consolidating & astracting several methods in the AWS SDK",
   "main": "./lib/index.js",
   "scripts": {
@@ -29,9 +29,9 @@
   },
   "homepage": "https://github.com/ghdna/athena-express#readme",
   "devDependencies": {
-    "aws-sdk": "^2.510.0",
+    "aws-sdk": "^2.648.0",
     "chai": "^4.2.0",
-    "coveralls": "^3.0.6",
+    "coveralls": "^3.0.11",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0"
