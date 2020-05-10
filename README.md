@@ -128,8 +128,8 @@ const athenaExpressConfig = {
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
 	encryption: OBJECT /* optional */
-    skipResults: BOOLEAN /* optional default=false */
-    waitForResults: BOOLEAN /* optional default=true */
+	skipResults: BOOLEAN /* optional default=false */
+	waitForResults: BOOLEAN /* optional default=true */
 };
 
 //Initializing AthenaExpress
@@ -154,13 +154,17 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 ## Usage: Invoking athena-express
 
-###### Using Promises:
+###### Using Promises to query Athena:
 
 ```javascript
+/*Option 1: object notation*/ 
 let myQuery = {
 	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 	db: "sampledb" /* optional. You could specify a database here or in the advance configuration option mentioned above*/
 };
+
+/*OR Option 2: string notation*/ 
+let myQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3"
 
 athenaExpress
 	.query(myQuery)
@@ -172,14 +176,18 @@ athenaExpress
 	});
 ```
 
-###### Using Async/Await:
+###### Using Async/Await to query Athena:
 
 ```javascript
 (async () => {
+/*Option 1: object notation*/ 
 	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
+    
+/*OR Option 2: string notation*/ 
+let myQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3"
 
 	try {
 		let results = await athenaExpress.query(myQuery);
@@ -189,7 +197,14 @@ athenaExpress
 	}
 })();
 ```
+###### Using QueryExecutionID (optional):
 
+Applicable only if you already have the `QueryExecutionID` from an earlier execution. See `skipResults` or `waitForResults` in the advance config params above to learn more.
+```javascript
+const myQueryExecutionId = "bf6ffb5f-6c36-4a66-8735-3be6275960ae";
+let results = await athenaExpress.query(myQueryExecutionId);
+console.log(results);
+```
 ## Full Examples
 
 ###### Using a standalone NodeJS application
