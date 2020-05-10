@@ -91,6 +91,8 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 	3. OR Use [instance profiles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) when using EC2s
 	4. OR Use [environment variables](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html)
 
+
+
 #### Option 1: Simple configuration
 
 - Simple configuration requires only the AWS SDK object to be passed as a parameter to initialize `athena-express`
@@ -125,9 +127,9 @@ const athenaExpressConfig = {
 	retry: Integer, /* optional default=200 */
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
-	encryption: OBJECT, /* optional */
-	skipResults: BOOLEAN, /* optional default=false */
-	waitForResults: BOOLEAN /* optional default=true */
+	encryption: OBJECT /* optional */
+    skipResults: BOOLEAN /* optional default=false */
+    waitForResults: BOOLEAN /* optional default=true */
 };
 
 //Initializing AthenaExpress
@@ -146,19 +148,9 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 |getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`EngineExecutionTimeInMillis`</li><li>`DataScannedInBytes`</li><li>`TotalExecutionTimeInMillis`</li><li>`QueryQueueTimeInMillis`</li><li>`QueryPlanningTimeInMillis`</li><li>`ServiceProcessingTimeInMillis`</li><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
 |encryption | object | -- | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
-|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />Best used with a combination of `getStats : true` so that the `QueryExecutionId` & `S3Location` can be captured for later reference.   |
-|waitForResults | boolean | `true` | Used to avoid waiting for the query completion when running the query method. Only the `QueryExecutionId` will be returned for later reference.   |
+|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />To retrieve the results, you can simply pass the `QueryExecutionId` into athena-express as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")`  |
+|waitForResults  | boolean | `true` | When low latency is the objective, you can skip waiting for a query to be completed in Athena. Returns `QueryExecutionId`, which you can pass into athena-express later as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")` <br /> Not to be confused with `skipResults`, which actually waits for the query to be completed before returning `QueryExecutionId` and other stats. `waitForResults` is meant for fire-and-forget kind of operations.  <br />  |
 
-###### Methods
-```javascript
-athenaExpress.query(sql, customOptions);
-```
-Executes the query it receives in the first parameter and optionally overrides current config if the second parameter is present
-
-```javascript
-athenaExpress.checkExecutionStatus(QueryExecutionId);
-```
-Returns query execution status for one QueryExecutionId
 
 ## Usage: Invoking athena-express
 
@@ -191,27 +183,6 @@ athenaExpress
 
 	try {
 		let results = await athenaExpress.query(myQuery);
-		console.log(results);
-	} catch (error) {
-		console.log(error);
-	}
-})();
-```
-
-###### Overriding query config:
-
-```javascript
-(async () => {
-	let myQuery = {
-		sql: "INSERT INTO logs SELECT elb_name, request_port, request_ip FROM elb_logs" /* required */,
-		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
-	};
-	const customConfig = {
-		waitForResults: false
-	};
-
-	try {
-		let results = await athenaExpress.query(myQuery, customConfig);
 		console.log(results);
 	} catch (error) {
 		console.log(error);
