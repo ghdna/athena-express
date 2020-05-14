@@ -127,8 +127,8 @@ const athenaExpressConfig = {
 	retry: Integer, /* optional default=200 */
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
-	encryption: OBJECT /* optional */
-	skipResults: BOOLEAN /* optional default=false */
+	encryption: OBJECT, /* optional */
+	skipResults: BOOLEAN, /* optional default=false */
 	waitForResults: BOOLEAN /* optional default=true */
 };
 
