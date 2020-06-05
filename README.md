@@ -120,14 +120,16 @@ const aws = require("aws-sdk");
 //Advance configuration with all options
 const athenaExpressConfig = {
 	aws, /* required */
-	s3: "STRING_VALUE", /* optional */
+	s3: "STRING_VALUE", /* optional format 's3://bucketname'*/
 	db: "STRING_VALUE", /* optional */
+	workgroup: "STRING_VALUE", /* optional */
 	formatJson: BOOLEAN, /* optional default=true */
 	retry: Integer, /* optional default=200 */
 	getStats: BOOLEAN, /* optional default=false */
 	ignoreEmpty: BOOLEAN, /* optional default=true */
-	encryption: OBJECT /* optional */
-    skipResults: BOOLEAN /* optional default=false */
+	encryption: OBJECT, /* optional */
+	skipResults: BOOLEAN, /* optional default=false */
+	waitForResults: BOOLEAN /* optional default=true */
 };
 
 //Initializing AthenaExpress
@@ -138,24 +140,31 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 | Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| s3 | string  | `athena-express` creates a new bucket for you  | S3 bucket name/prefix to store Athena query results  |
+| s3 | string  | `athena-express` creates a new bucket for you  | The location in Amazon S3 where your query results are stored, such as `s3://path/to/query/bucket/`. <br /> `athena-express` will create a new bucket for you if you don't provide a value for this param but sometimes that could cause an issue if you had recently deleted a bucket with the same name. (something to do with cache). When that happens, just specify you own bucket name. Alternatively you can also use `workgroup`.   |
 | db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
+| workgroup | string  | `primary`  | The name of the workgroup in which the query is being started. <br /> Note: athena-express cannot create workgroups (as it includes a lot of configuration) so you will need to create one beforehand IFF you intend to use a non default workgroup. Learn More here. [Setting up Workgroups](https://docs.aws.amazon.com/athena/latest/ug/user-created-workgroups.html) |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |
 |retry  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing |
-|getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`EngineExecutionTimeInMillis`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
+|getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`EngineExecutionTimeInMillis`</li><li>`DataScannedInBytes`</li><li>`TotalExecutionTimeInMillis`</li><li>`QueryQueueTimeInMillis`</li><li>`QueryPlanningTimeInMillis`</li><li>`ServiceProcessingTimeInMillis`</li><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
 |encryption | object | -- | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
-|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />Best used with a combination of `getStats : true` so that the `QueryExecutionId` & `S3Location` can be captured for later reference.   |
+|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />To retrieve the results, you can simply pass the `QueryExecutionId` into athena-express as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")`  |
+|waitForResults  | boolean | `true` | When low latency is the objective, you can skip waiting for a query to be completed in Athena. Returns `QueryExecutionId`, which you can pass into athena-express later as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")` <br /> Not to be confused with `skipResults`, which actually waits for the query to be completed before returning `QueryExecutionId` and other stats. `waitForResults` is meant for fire-and-forget kind of operations.  <br />  |
+
 
 ## Usage: Invoking athena-express
 
-###### Using Promises:
+###### Using Promises to query Athena:
 
 ```javascript
+/*Option 1: object notation*/ 
 let myQuery = {
 	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 	db: "sampledb" /* optional. You could specify a database here or in the advance configuration option mentioned above*/
 };
+
+/*OR Option 2: string notation*/ 
+let myQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3"
 
 athenaExpress
 	.query(myQuery)
@@ -167,14 +176,18 @@ athenaExpress
 	});
 ```
 
-###### Using Async/Await:
+###### Using Async/Await to query Athena:
 
 ```javascript
 (async () => {
+/*Option 1: object notation*/ 
 	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3" /* required */,
 		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
+    
+/*OR Option 2: string notation*/ 
+let myQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3"
 
 	try {
 		let results = await athenaExpress.query(myQuery);
@@ -184,7 +197,14 @@ athenaExpress
 	}
 })();
 ```
+###### Using QueryExecutionID (optional):
 
+Applicable only if you already have the `QueryExecutionID` from an earlier execution. See `skipResults` or `waitForResults` in the advance config params above to learn more.
+```javascript
+const myQueryExecutionId = "bf6ffb5f-6c36-4a66-8735-3be6275960ae";
+let results = await athenaExpress.query(myQueryExecutionId);
+console.log(results);
+```
 ## Full Examples
 
 ###### Using a standalone NodeJS application
