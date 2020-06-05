@@ -16,6 +16,7 @@ declare module 'athena-express' {
         QueryCostInUSD: number;
         EngineExecutionTimeInMillis: number;
         S3Location: string;
+        QueryExecutionId: string;
         Count: number;
     }
 
