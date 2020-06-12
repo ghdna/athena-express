@@ -4,6 +4,14 @@ declare module 'athena-express' {
         aws: typeof aws;
         s3: string;
         getStats: boolean;
+        db: string,
+        workgroup: string,
+        formatJson: boolean,
+        retry: number,
+        ignoreEmpty: boolean,
+        encryption: Record<string, string>,
+        skipResults: boolean,
+        waitForResults: boolean
     }
 
     type GenericObject = {
