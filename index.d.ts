@@ -14,10 +14,6 @@ declare module 'athena-express' {
         waitForResults: boolean
     }
 
-    type GenericObject = {
-        [names: string]: any;
-    };
-
     interface QueryResultsInterface<T> {
         Items: T[];
         DataScannedInMB: number;
