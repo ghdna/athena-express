@@ -18,6 +18,11 @@ declare module 'athena-express' {
         S3Location: string;
         QueryExecutionId: string;
         Count: number;
+        DataScannedInBytes: number;
+        TotalExecutionTimeInMillis: number;
+        QueryQueueTimeInMillis: number;
+        QueryPlanningTimeInMillis: number;
+        ServiceProcessingTimeInMillis: number;
     }
 
     interface QueryInterface {
@@ -38,4 +43,3 @@ declare module 'athena-express' {
         query: QueryFunc;
     }
 }
-
