@@ -45,8 +45,9 @@ declare module 'athena-express' {
     }
 
     class AthenaExpress {
-        new: (config: ConnectionConfigInterface) => any;
-        constructor(config: ConnectionConfigInterface);
+        public new: (config: Partial<ConnectionConfigInterface>) => any;
+        public query: QueryFunc;
+        constructor(config: Partial<ConnectionConfigInterface>);
         query: QueryFunc;
     }
 }
