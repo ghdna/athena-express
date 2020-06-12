@@ -25,13 +25,16 @@ declare module 'athena-express' {
         ServiceProcessingTimeInMillis: number;
     }
 
-    interface QueryInterface {
+    interface QueryObjectInterface {
         sql: string;
         db: string;
     }
+    type DirectQueryString = string;
+    type QueryExecutionId = string;
 
-    type QueryResult = QueryResultsInterface<any>;
-    type QueryFunc = (query: QueryInterface) => Promise<QueryResult>;
+    type OptionalQueryResultsInterface<T> = Partial<QueryResultsInterface<T>> & Pick<QueryResultsInterface<T>, 'QueryExecutionId'>;
+    type QueryResult<T> = OptionalQueryResultsInterface<T>;
+    type QueryFunc<T> = (query: QueryObjectInterface|DirectQueryString|QueryExecutionId) => Promise<QueryResult<T>>;
     interface AthenaExpressInterface {
         new: (config: ConnectionConfigInterface) => any;
         query: QueryFunc;
