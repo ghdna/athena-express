@@ -38,11 +38,11 @@ declare module 'athena-express' {
 
     type OptionalQueryResultsInterface<T> = Partial<QueryResultsInterface<T>> & Pick<QueryResultsInterface<T>, 'QueryExecutionId'>;
     type QueryResult<T> = OptionalQueryResultsInterface<T>;
-    type QueryFunc<T> = (query: QueryObjectInterface|DirectQueryString|QueryExecutionId) => Promise<QueryResult<T>>;
+    type QueryFunc = <T = any>(query: QueryObjectInterface|DirectQueryString|QueryExecutionId) => Promise<QueryResult<T>>;
 
-    class AthenaExpress<T> {
+    class AthenaExpress {
         public new: (config: Partial<ConnectionConfigInterface>) => any;
-        public query: QueryFunc<T>;
+        public query: QueryFunc;
         constructor(config: Partial<ConnectionConfigInterface>);
     }
 }
