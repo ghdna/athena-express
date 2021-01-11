@@ -57,5 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
-example.js
+# vscode launch configuration
+.vscode
 
+example.js
