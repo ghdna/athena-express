@@ -121,6 +121,7 @@ const aws = require("aws-sdk");
 const athenaExpressConfig = {
 	aws, /* required */
 	s3: "STRING_VALUE", /* optional format 's3://bucketname'*/
+	catalog: "STRING_VALUE", /* optional - data source */
 	db: "STRING_VALUE", /* optional */
 	workgroup: "STRING_VALUE", /* optional */
 	formatJson: BOOLEAN, /* optional default=true */
@@ -141,6 +142,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 | Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- | ------------- |
 | s3 | string  | `athena-express` creates a new bucket for you  | The location in Amazon S3 where your query results are stored, such as `s3://path/to/query/bucket/`. <br /> `athena-express` will create a new bucket for you if you don't provide a value for this param but sometimes that could cause an issue if you had recently deleted a bucket with the same name. (something to do with cache). When that happens, just specify you own bucket name. Alternatively you can also use `workgroup`.   |
+| catalog | string | Athena data source / catalog, required for federated connectors | 
 | db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
 | workgroup | string  | `primary`  | The name of the workgroup in which the query is being started. <br /> Note: athena-express cannot create workgroups (as it includes a lot of configuration) so you will need to create one beforehand IFF you intend to use a non default workgroup. Learn More here. [Setting up Workgroups](https://docs.aws.amazon.com/athena/latest/ug/user-created-workgroups.html) |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |

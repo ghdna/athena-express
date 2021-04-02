@@ -4,6 +4,7 @@ declare module 'athena-express' {
         aws: typeof aws;
         s3: string;
         getStats: boolean;
+        catalog: string,
         db: string,
         workgroup: string,
         formatJson: boolean,
