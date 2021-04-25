@@ -11,7 +11,9 @@ declare module 'athena-express' {
         ignoreEmpty: boolean,
         encryption: Record<string, string>,
         skipResults: boolean,
-        waitForResults: boolean
+        waitForResults: boolean,
+        catalog: string,
+        pagination: string
     }
 
     interface QueryResultsInterface<T> {
@@ -21,6 +23,7 @@ declare module 'athena-express' {
         EngineExecutionTimeInMillis: number;
         S3Location: string;
         QueryExecutionId: string;
+        NextToken: string;
         Count: number;
         DataScannedInBytes: number;
         TotalExecutionTimeInMillis: number;
