@@ -74,21 +74,21 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 - This AWS object is passed within the constructor so that it can invoke Amazon Athena SDK. It's up to you how you create this `aws` object. Here are 4 options: 
 	1. Create an `aws` object by explicitly passing in the `accessKeyId` and `secretAccessKey` generated in prerequisites
 	```javascript 
-    const aws = require("aws-sdk");
+    const AWS = require("aws-sdk");
     const awsCredentials = {
         region: "YOUR_AWS_REGION",
 		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
 		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
     };
-    aws.config.update(awsCredentials);
+    AWS.config.update(awsCredentials);
 
-    const athenaExpressConfig = { aws }; //configuring athena-express with aws sdk object
+    const athenaExpressConfig = { aws: AWS }; //configuring athena-express with aws sdk object
     const athenaExpress = new AthenaExpress(athenaExpressConfig);
 	```
 	2. OR if using Lambda, provide an [IAM execution role](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) with `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached
  	```javascript 
-    const aws = require("aws-sdk");
-	const athenaExpressConfig = { aws }; //configuring athena-express with aws sdk object
+    const AWS = require("aws-sdk");
+	const athenaExpressConfig = { aws: AWS }; //configuring athena-express with aws sdk object
     const athenaExpress = new AthenaExpress(athenaExpressConfig);
 	```  
 	3. OR Use [instance profiles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) when using EC2s
@@ -102,9 +102,9 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 - Default values are assumed for all parameter options and `athena-express` creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
 
 ```javascript
-const aws = require("aws-sdk");
+const AWS = require("aws-sdk");
 
-const athenaExpressConfig = { aws }; //simple configuration with just an aws sdk object
+const athenaExpressConfig = { aws: AWS }; //simple configuration with just an aws sdk object
 
 //Initializing athena-express
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
@@ -118,11 +118,11 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 
 ```javascript
-const aws = require("aws-sdk");
+const AWS = require("aws-sdk");
 
 //Example showing all Config parameters.
 const athenaExpressConfig = {
-	aws, // required 
+	aws: AWS, // required 
 	s3: "s3://mybucketname", // optional 
 	db: "myDbName", // optional
 	workgroup: "myWorkGroupName", // optional
@@ -132,8 +132,8 @@ const athenaExpressConfig = {
 	ignoreEmpty: true, // optional
 	encryption: { EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}, // optional
 	skipResults: false, // optional
-	waitForResults: false // optional
-    catalog: "hive" //optional
+	waitForResults: false, // optional
+	catalog: "hive" //optional
 };
 
 //Initializing AthenaExpress
@@ -242,17 +242,17 @@ console.log(results);
 "use strict";
 
 const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk"),
+	AWS = require("aws-sdk"),
 	awsCredentials = {
 		region: "YOUR_AWS_REGION",
 		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
 		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
 	};
 
-aws.config.update(awsCredentials);
+AWS.config.update(awsCredentials);
 
 const athenaExpressConfig = {
-	aws,
+	aws: AWS,
 	s3: "s3://my-bucket-for-storing-athena-results-us-east-1",
 	getStats: true
 };
@@ -281,7 +281,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 "use strict";
 
 const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk");
+	AWS = require("aws-sdk");
 
 	/* AWS Credentials are not required here 
     /* Make sure the IAM Execution Role used by this Lambda 
@@ -290,7 +290,7 @@ const AthenaExpress = require("athena-express"),
     /* See configuration section above under Setup for more info */
 
 const athenaExpressConfig = {
-	aws,
+	aws: AWS,
 	db: "sampledb",
 	getStats: true
 };
