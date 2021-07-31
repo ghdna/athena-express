@@ -344,6 +344,20 @@ async function main() {
 main();
 
 ```
+######  Query to fetch results (rows) for an async iterable of pages
+
+You can also receive an async iterable that yields all result pages, seamless.
+
+```javascript
+async function main() {
+    const results = athenaExpress.queryIterable("SELECT * from students LIMIT 100", 10);
+	for await (const page of results) {
+    	console.log(page);
+	}
+}
+main();
+
+```
 
 
 ##### UTILITY queries
