@@ -45,6 +45,7 @@ declare module 'athena-express' {
 
     class AthenaExpress<T> {
         public new: (config: Partial<ConnectionConfigInterface>) => any;
+        public queryIterable(sql: string, pagination?: number): AsyncIterable<QueryResult<T>>;
         public query: QueryFunc<T>;
         constructor(config: Partial<ConnectionConfigInterface>);
     }
