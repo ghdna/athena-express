@@ -155,6 +155,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 |skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />To retrieve the results, you can simply pass the `QueryExecutionId` into athena-express as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")`  |
 |waitForResults  | boolean | `true` | When low latency is the objective, you can skip waiting for a query to be completed in Athena. Returns `QueryExecutionId`, which you can pass into athena-express later as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")` <br /> Not to be confused with `skipResults`, which actually waits for the query to be completed before returning `QueryExecutionId` and other stats. `waitForResults` is meant for fire-and-forget kind of operations.  <br />  |
 |catalog  | string | `null` | The catalog to which the query results belong  |
+useUtcDates | boolean | (default false) | Cast Date and Timestamp types to Javascript Date objects with timezone in UTC. Set this option if your code runs in machines configured with UTC as their timezone or if you want to work with Date objects in UTC timezone. Useful when your Dates and Timestamp columns are representing UTC date and time and you want to work with Date objects instead of String objects
 
 
 
