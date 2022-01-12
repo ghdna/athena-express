@@ -189,7 +189,7 @@ let myQuery = {
 /*Option 1: object notation*/ 
 let myQuery = {
 	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?" /* required */,
-	queryParams: [3],
+	QueryParams: [3],
 	db: "sampledb" /* optional. You could specify a database here or in the advance configuration option mentioned above*/
 };
 
@@ -213,7 +213,7 @@ athenaExpress
 /*Option 1: object notation*/ 
 	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?" /* required */,
-		queryParams: [3],
+		QueryParams: [3],
 		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
     
@@ -265,7 +265,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 (async () => {
 	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?",
-		queryParams: [3],
+		QueryParams: [3],
 		db: "sampledb"
 	};
 
