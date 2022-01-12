@@ -1,11 +1,11 @@
 language: "node_js"
 node_js:
+  - "12"
+  - "11"
   - "10"
-  - "9"
-  - "8"
 
 before script:
-  - "npm install athena-express"
+  #- "npm install athena-express"
 
 before_install:
   - "npm install"

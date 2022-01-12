@@ -12,7 +12,7 @@
 
 ## Synopsis
 
-Athena-Express can simplify executing SQL queries in Amazon Athena **AND** fetching _cleaned-up_ JSON results in the same synchronous call - well suited for web applications. 
+Athena-Express can simplify executing SQL queries in Amazon Athena **AND** fetching _cleaned-up_ JSON results in the same synchronous or asynchronous request - well suited for web applications. 
 
 
 ##### Example:
@@ -41,14 +41,17 @@ And as added features
 4.	Formats the results into a clean, user-friendly JSON array
 5.	Handles specific Athena errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
 6.	Provides optional helpful stats including cost per query in USD
+7.	Fetching results (rows) via Pagination OR as a continuous stream
+8.	Synchrnous and Asynchornous fetching of results (rows)
 
 Integrating with Amazon Athena without `athena-express` would require you to identify the appropriate API methods in the AWS SDK, stich them together sequentially, and then build out an error handling & retry mechanism for each of those methods. 
 
-`athena-express` can help you save time & effort in setting up this integration so that you can focus on core application development. 
+
+>`athena-express` can help you save time & effort in setting up this integration so that you can focus on core application development. 
 
 
 ### How is athena-express being used?
-The most common use case is integrating a web front-end with Amazon Athena using `athena-express` as a backend. This backend could be any Node.JS application including AWS Lambda.
+The most common use case is integrating a web front-end with Amazon Athena using `athena-express` as a backend. This backend could be any Node.JS application that could be hosted locally, or on an EC2 instance, or AWS Lambda.
 
 Here is an example using AWS Lambda: 
 <img src="https://image.ibb.co/k3RpNA/Screen-Shot-2018-11-22-at-11-17-58-AM.pngg" alt="athena-express architecture" width="700">
@@ -71,21 +74,21 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 - This AWS object is passed within the constructor so that it can invoke Amazon Athena SDK. It's up to you how you create this `aws` object. Here are 4 options: 
 	1. Create an `aws` object by explicitly passing in the `accessKeyId` and `secretAccessKey` generated in prerequisites
 	```javascript 
-    const aws = require("aws-sdk");
+    const AWS = require("aws-sdk");
     const awsCredentials = {
         region: "YOUR_AWS_REGION",
 		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
 		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
     };
-    aws.config.update(awsCredentials);
+    AWS.config.update(awsCredentials);
 
-    const athenaExpressConfig = { aws }; //configuring athena-express with aws sdk object
+    const athenaExpressConfig = { aws: AWS }; //configuring athena-express with aws sdk object
     const athenaExpress = new AthenaExpress(athenaExpressConfig);
 	```
 	2. OR if using Lambda, provide an [IAM execution role](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) with `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached
  	```javascript 
-    const aws = require("aws-sdk");
-	const athenaExpressConfig = { aws }; //configuring athena-express with aws sdk object
+    const AWS = require("aws-sdk");
+	const athenaExpressConfig = { aws: AWS }; //configuring athena-express with aws sdk object
     const athenaExpress = new AthenaExpress(athenaExpressConfig);
 	```  
 	3. OR Use [instance profiles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) when using EC2s
@@ -93,41 +96,44 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 
 
 
-#### Option 1: Simple configuration
+#### Simple configuration
 
 - Simple configuration requires only the AWS SDK object to be passed as a parameter to initialize `athena-express`
 - Default values are assumed for all parameter options and `athena-express` creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
 
 ```javascript
-const aws = require("aws-sdk");
+const AWS = require("aws-sdk");
 
-const athenaExpressConfig = { aws }; //simple configuration with just an aws sdk object
+const athenaExpressConfig = { aws: AWS }; //simple configuration with just an aws sdk object
 
 //Initializing athena-express
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
 ```
 
 
-#### Option 2: Advance configuration
+#### Advance configuration
 
 - Besides the `aws` sdk paramater that is required, you can add any of the following optional parameters below
 
 
 
 ```javascript
-const aws = require("aws-sdk");
+const AWS = require("aws-sdk");
 
-//Advance configuration with all options
+//Example showing all Config parameters.
 const athenaExpressConfig = {
-	aws, /* required */
-	s3: "STRING_VALUE", /* optional */
-	db: "STRING_VALUE", /* optional */
-	formatJson: BOOLEAN, /* optional default=true */
-	retry: Integer, /* optional default=200 */
-	getStats: BOOLEAN, /* optional default=false */
-	ignoreEmpty: BOOLEAN, /* optional default=true */
-	encryption: OBJECT /* optional */
-    skipResults: BOOLEAN /* optional default=false */
+	aws: AWS, // required 
+	s3: "s3://mybucketname", // optional 
+	db: "myDbName", // optional
+	workgroup: "myWorkGroupName", // optional
+	formatJson: true, // optional
+	retry: 200, // optional
+	getStats: true, // optional
+	ignoreEmpty: true, // optional
+	encryption: { EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}, // optional
+	skipResults: false, // optional
+	waitForResults: false, // optional
+	catalog: "hive" //optional
 };
 
 //Initializing AthenaExpress
@@ -138,25 +144,57 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 | Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| s3 | string  | `athena-express` creates a new bucket for you  | S3 bucket name/prefix to store Athena query results  |
+| s3 | string  | `athena-express` creates a new bucket for you  | The location in Amazon S3 where your query results are stored, such as `s3://path/to/query/bucket/`. <br /> `athena-express` will create a new bucket for you if you don't provide a value for this param but sometimes that could cause an issue if you had recently deleted a bucket with the same name. (something to do with cache). When that happens, just specify you own bucket name. Alternatively you can also use `workgroup`.   |
 | db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
+| workgroup | string  | `primary`  | The name of the workgroup in which the query is being started. <br /> Note: athena-express cannot create workgroups (as it includes a lot of configuration) so you will need to create one beforehand IFF you intend to use a non default workgroup. Learn More here. [Setting up Workgroups](https://docs.aws.amazon.com/athena/latest/ug/user-created-workgroups.html) |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |
 |retry  | integer | `200` milliseconds| Wait interval between re-checking if the specific Athena query has finished executing |
-|getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`EngineExecutionTimeInMillis`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
+|getStats | boolean | `false`| Set `getStats: true` to capture additional metadata for your query, such as: <ul><li>`EngineExecutionTimeInMillis`</li><li>`DataScannedInBytes`</li><li>`TotalExecutionTimeInMillis`</li><li>`QueryQueueTimeInMillis`</li><li>`QueryPlanningTimeInMillis`</li><li>`ServiceProcessingTimeInMillis`</li><li>`DataScannedInMB`</li><li>`QueryCostInUSD`</li><li>`Count`</li><li>`QueryExecutionId`</li><li>`S3Location`</li></ul> |
 |ignoreEmpty  | boolean | `true`| Ignore fields with empty values from the final JSON response.  |
 |encryption | object | -- | [Encryption configuation](https://docs.aws.amazon.com/athena/latest/ug/encryption.html) example usage: <br />`{ EncryptionOption: "SSE_KMS", KmsKey: process.env.kmskey}` |
-|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />Best used with a combination of `getStats : true` so that the `QueryExecutionId` & `S3Location` can be captured for later reference.   |
+|skipResults | boolean | `false` | For a unique requirement where a user may only want to execute the query in Athena and store the results in S3 but NOT fetch those results in that moment. <br />Perhaps to be retrieved later or simply stored in S3 for auditing/logging purposes. <br />To retrieve the results, you can simply pass the `QueryExecutionId` into athena-express as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")`  |
+|waitForResults  | boolean | `true` | When low latency is the objective, you can skip waiting for a query to be completed in Athena. Returns `QueryExecutionId`, which you can pass into athena-express later as such: `athenaExpress.query("ab493e66-138f-4b78-a187-51f43fd5f0eb")` <br /> Not to be confused with `skipResults`, which actually waits for the query to be completed before returning `QueryExecutionId` and other stats. `waitForResults` is meant for fire-and-forget kind of operations.  <br />  |
+|catalog  | string | `null` | The catalog to which the query results belong  |
+
+
+
+
+###### Advance Query Parameters:
+```javascript
+//Example showing all Query parameters.
+let myQuery = {
+    sql: "SELECT * FROM elb_logs LIMIT 3" // required,
+    db: "sampledb", // optional. 
+    pagination: 5, //optional
+    NextToken: "ARfCDXRjMk...", //optional
+    QueryExecutionId: "c274843b-4c5c-4ccf-ac8b-e33d595b927d", //optional
+    catalog: "hive" //optional
+};
+```
+
+| Parameter  | Format | Default Value | Description |
+| ------------- | ------------- | ------------- | ------------- |
+| sql  | string <br /> `required`  |  | The SQL query statements to be executed. <br /> E.g. "SELECT * FROM elb_logs LIMIT 3  |
+| db | string <br />   | `default` |The name of the database used in the query execution. <br /> You can specify the database name here within the query itself OR in athenaExpressConfig during initialization as shown in [Advance Config Parameters](https://github.com/ghdna/athena-express#advance-config-parameters) |
+| pagination | string  | `0` <br /> max: `1000` | Maximum number of results (rows) to return in a single paginated response. <br />Response includes results from page 1 along with `NextToken` and `QueryExecutionId` IFF the response was truncated <br /> To obtain the next set of pages, pass in the `NextToken` and `QueryExecutionId` back to Athena. <br /> See [example here](https://github.com/ghdna/athena-express#more-examples)	 |
+| NextToken | string  | `null` | A token generated by the Athena service that specifies where to continue pagination if a previous request was truncated. To obtain the next set of pages, pass in the NextToken from the response object of the previous page call.  |
+| QueryExecutionId | string  | `null` | The unique ID of the query execution. <br />To be passed into the AthenaExpress query when using the features of `Pagination`, `waitForResults` or `skipResults `  |
+|catalog  | string | `null` | The catalog to which the query results belong  |
 
 ## Usage: Invoking athena-express
 
-###### Using Promises:
+###### Using Promises to query Athena:
 
 ```javascript
+/*Option 1: object notation*/ 
 let myQuery = {
 	sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?" /* required */,
 	queryParams: [3],
 	db: "sampledb" /* optional. You could specify a database here or in the advance configuration option mentioned above*/
 };
+
+/*OR Option 2: string notation*/ 
+let myQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3"
 
 athenaExpress
 	.query(myQuery)
@@ -168,15 +206,19 @@ athenaExpress
 	});
 ```
 
-###### Using Async/Await:
+###### Using Async/Await to query Athena:
 
 ```javascript
 (async () => {
+/*Option 1: object notation*/ 
 	let myQuery = {
 		sql: "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT ?" /* required */,
 		queryParams: [3],
 		db: "sampledb" /* optional. You could specify a database here or in the configuration constructor*/
 	};
+    
+/*OR Option 2: string notation*/ 
+let myQuery = "SELECT elb_name, request_port, request_ip FROM elb_logs LIMIT 3"
 
 	try {
 		let results = await athenaExpress.query(myQuery);
@@ -186,7 +228,14 @@ athenaExpress
 	}
 })();
 ```
+###### Using QueryExecutionID:
 
+Applicable only if you already have the `QueryExecutionID` from an earlier execution. See `skipResults` or `waitForResults` in the advance config params above to learn more.
+```javascript
+const myQueryExecutionId = "bf6ffb5f-6c36-4a66-8735-3be6275960ae";
+let results = await athenaExpress.query(myQueryExecutionId);
+console.log(results);
+```
 ## Full Examples
 
 ###### Using a standalone NodeJS application
@@ -195,17 +244,17 @@ athenaExpress
 "use strict";
 
 const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk"),
+	AWS = require("aws-sdk"),
 	awsCredentials = {
 		region: "YOUR_AWS_REGION",
 		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
 		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
 	};
 
-aws.config.update(awsCredentials);
+AWS.config.update(awsCredentials);
 
 const athenaExpressConfig = {
-	aws,
+	aws: AWS,
 	s3: "s3://my-bucket-for-storing-athena-results-us-east-1",
 	getStats: true
 };
@@ -235,7 +284,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 "use strict";
 
 const AthenaExpress = require("athena-express"),
-	aws = require("aws-sdk");
+	AWS = require("aws-sdk");
 
 	/* AWS Credentials are not required here 
     /* Make sure the IAM Execution Role used by this Lambda 
@@ -244,7 +293,7 @@ const AthenaExpress = require("athena-express"),
     /* See configuration section above under Setup for more info */
 
 const athenaExpressConfig = {
-	aws,
+	aws: AWS,
 	db: "sampledb",
 	getStats: true
 };
@@ -267,7 +316,40 @@ exports.handler = async event => {
 <img src="https://image.ibb.co/fpARNA/carbon-2.png" alt="Athena-Express result" width="400">
 
 ## More Examples
-##### UTILITY queries - Added in v3.0
+##### Pagination
+######  Query to fetch results (rows) for page 1
+```javascript
+async function main() {
+     const myQuery = {
+        sql: "SELECT * from students LIMIT 100",
+        pagination: 10
+    };
+    let results = await athenaExpress.query(myQuery);
+    console.log(results);
+}
+main();
+
+```
+This will fetch the first 10 results (rows) off the 100 that exits in Athena. To query the next 10 rows, pass the values for `NextToken` and `QueryExecutionId` that were returned in the first query.
+
+###### Query to fetch results (rows) for page 2 and beyond
+```javascript
+async function main() {
+     const myQuery = {
+        sql: "SELECT * from students LIMIT 100",
+        pagination: 10,
+        NextToken: "ARfCDXRjMkQsR1NWziK1ARgiip3umf3q0/bZmNZWeQxUDc7iSToT7uJHy2yo8nL5FyxQoIIkuPh/zDD51xld7SoALA+zhMhpZg==",
+        QueryExecutionId: "c274843b-4c5c-4ccf-ac8b-e33d595b927d",
+    };
+    let results = await athenaExpress.query(myQuery);
+    console.log(results);
+}
+main();
+
+```
+
+
+##### UTILITY queries
 ###### Show Tables (single column result)
  ```javascript
  const results = await athenaExpress.query("SHOW TABLES");
