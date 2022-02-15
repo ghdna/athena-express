@@ -9,6 +9,7 @@ declare module 'athena-express' {
         formatJson: boolean,
         retry: number,
         ignoreEmpty: boolean,
+        flatKeys: boolean,
         encryption: Record<string, string>,
         skipResults: boolean,
         waitForResults: boolean,
