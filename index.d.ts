@@ -1,8 +1,10 @@
 declare module 'athena-express' {
-    import * as aws from 'aws-sdk';
+    import { S3 } from '@aws-sdk/client-s3';
+    import { Athena } from '@aws-sdk/client-athena';
     interface ConnectionConfigInterface {
-        aws: typeof aws;
-        s3: string;
+        athena: typeof Athena,
+        s3: typeof S3,
+        s3Bucket: string;
         getStats: boolean;
         db: string,
         workgroup: string,

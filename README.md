@@ -66,45 +66,36 @@ This API Gateway then triggers a Lambda function that has the `athena-express` l
 ### Prerequisites
 
 -   You will need either an `IAM Role` (if you're running `athena-express` on AWS Lambda or AWS EC2) **OR** an `IAM User` with `accessKeyId` and `secretAccessKey` (if you're running `athena-express` on a standalone NodeJS application)
--   This IAM role/user must have `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached 
+-   This IAM role or user must have `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached 
     -   Note: As an alternative to granting `AmazonS3FullAccess` you could granularize and limit write access to a specific `bucket`. Just specify this bucket name during `athena-express` initialization
 
 ### Configuration
-- `athena-express` needs an AWS SDK object created with relevant permissions as mentioned in the prerequisites above.
-- This AWS object is passed within the constructor so that it can invoke Amazon Athena SDK. It's up to you how you create this `aws` object. Here are 4 options: 
-	1. Create an `aws` object by explicitly passing in the `accessKeyId` and `secretAccessKey` generated in prerequisites
-	```javascript 
-    const AWS = require("aws-sdk");
-    const awsCredentials = {
-        region: "YOUR_AWS_REGION",
-		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
-		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
-    };
-    AWS.config.update(awsCredentials);
+- `athena-express` needs an [AWS SDK V3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html) [Athena aggregated client](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-athena/classes/athena.html) and an [S3 aggregated client](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/s3.html), both created with relevant permissions as mentioned in the prerequisites above.
+- These AWS SDK objects are passed within the constructor so that it can invoke Amazon Athena SDK. In most cases this is sufficient. The snippet of code that follows will work with these 4 configurations scenarios.
+	1. Use a shared credentials file, as is done with the AWS CLI (https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-shared.html)
+	2. OR if using Lambda, provide an [IAM execution role](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-lambda.html) with `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached
+	3. OR Use [instance profiles](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-iam.html) when using EC2s
+	4. OR Use [environment variables](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-environment.html)
 
-    const athenaExpressConfig = { aws: AWS }; //configuring athena-express with aws sdk object
-    const athenaExpress = new AthenaExpress(athenaExpressConfig);
-	```
-	2. OR if using Lambda, provide an [IAM execution role](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/using-lambda-iam-role-setup.html) with `AmazonAthenaFullAccess` and `AmazonS3FullAccess` policies attached
- 	```javascript 
-    const AWS = require("aws-sdk");
-	const athenaExpressConfig = { aws: AWS }; //configuring athena-express with aws sdk object
-    const athenaExpress = new AthenaExpress(athenaExpressConfig);
-	```  
-	3. OR Use [instance profiles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) when using EC2s
-	4. OR Use [environment variables](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html)
+```javascript 
+const athena = require("@aws-sdk/client-athena");
+const s3 = require("@aws-sdk/client-s3");
 
+const athenaExpressConfig = { athena: new athena.Athena({}), s3: new s3.S3({}) }; //configuring athena-express with aws sdk object
+const athenaExpress = new AthenaExpress(athenaExpressConfig);
+```
 
 
 #### Simple configuration
 
-- Simple configuration requires only the AWS SDK object to be passed as a parameter to initialize `athena-express`
+- Simple configuration requires only the AWS Athena and S3 objects to be passed as a parameter to initialize `athena-express`
 - Default values are assumed for all parameter options and `athena-express` creates a new `S3 bucket` in your AWS account for Amazon Athena to store the query results in.
 
 ```javascript
-const AWS = require("aws-sdk");
+const athena = require("@aws-sdk/client-athena");
+const s3 = require("@aws-sdk/client-s3");
 
-const athenaExpressConfig = { aws: AWS }; //simple configuration with just an aws sdk object
+const athenaExpressConfig = { athena: new athena.Athena({}), s3: new s3.S3({}) }; //simple configuration with just an aws sdk object
 
 //Initializing athena-express
 const athenaExpress = new AthenaExpress(athenaExpressConfig);
@@ -113,17 +104,19 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 #### Advance configuration
 
-- Besides the `aws` sdk paramater that is required, you can add any of the following optional parameters below
+- Besides the `Athena` and `S3` client paramaters and the `s3Bucket` parameter that are required, you can add any of the following optional parameters below
 
 
 
 ```javascript
-const AWS = require("aws-sdk");
+const athena = require("@aws-sdk/client-athena");
+const s3 = require("@aws-sdk/client-s3");
 
 //Example showing all Config parameters.
 const athenaExpressConfig = {
-	aws: AWS, // required 
-	s3: "s3://mybucketname", // optional 
+	athena: new athena.Athena({}), // required 
+	s3: new s3.S3({}), // required
+	s3Bucket: "s3://mybucketname", // required 
 	db: "myDbName", // optional
 	workgroup: "myWorkGroupName", // optional
 	formatJson: true, // optional
@@ -144,7 +137,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 | Parameter  | Format | Default Value | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| s3 | string  | `athena-express` creates a new bucket for you  | The location in Amazon S3 where your query results are stored, such as `s3://path/to/query/bucket/`. <br /> `athena-express` will create a new bucket for you if you don't provide a value for this param but sometimes that could cause an issue if you had recently deleted a bucket with the same name. (something to do with cache). When that happens, just specify you own bucket name. Alternatively you can also use `workgroup`.   |
+| s3Bucket | string  | none | The location in Amazon S3 where your query results are stored, such as `s3://path/to/query/bucket/`.
 | db | string  | `default`  | Athena database name that the SQL queries should be executed in. When a `db` name is specified in the config, you can execute SQL queries without needing to explicitly mention DB name. e.g. <br />` athenaExpress.query("SELECT * FROM movies LIMIT 3")` <br /> as opposed to <br />` athenaExpress.query({sql: "SELECT * FROM movies LIMIT 3", db: "moviedb"});`  |
 | workgroup | string  | `primary`  | The name of the workgroup in which the query is being started. <br /> Note: athena-express cannot create workgroups (as it includes a lot of configuration) so you will need to create one beforehand IFF you intend to use a non default workgroup. Learn More here. [Setting up Workgroups](https://docs.aws.amazon.com/athena/latest/ug/user-created-workgroups.html) |
 |formatJson  | boolean | `true` |  Override as false if you rather get the raw unformatted output from S3. |
@@ -242,18 +235,13 @@ console.log(results);
 "use strict";
 
 const AthenaExpress = require("athena-express"),
-	AWS = require("aws-sdk"),
-	awsCredentials = {
-		region: "YOUR_AWS_REGION",
-		accessKeyId: "YOUR_AWS_ACCESS_KEY_ID",
-		secretAccessKey: "YOUR_AWS_SECRET_ACCESS_KEY"
-	};
-
-AWS.config.update(awsCredentials);
+	athena = require("@aws-sdk/client-athena"),
+	s3 = require("@aws-sdk/client-s3");
 
 const athenaExpressConfig = {
-	aws: AWS,
-	s3: "s3://my-bucket-for-storing-athena-results-us-east-1",
+	athena: new athena.Athena({}),
+	s3: new s3.S3({}),
+	s3Bucket: "s3://my-bucket-for-storing-athena-results-us-east-1",
 	getStats: true
 };
 
@@ -281,16 +269,18 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 "use strict";
 
 const AthenaExpress = require("athena-express"),
-	AWS = require("aws-sdk");
+	athena = require("@aws-sdk/client-athena"),
+	s3 = require("@aws-sdk/client-s3");
 
-	/* AWS Credentials are not required here 
+    /* AWS Credentials are not required here 
     /* Make sure the IAM Execution Role used by this Lambda 
     /* has the necessary permission to execute Athena queries 
     /* and store the result in Amazon S3 bucket
     /* See configuration section above under Setup for more info */
 
 const athenaExpressConfig = {
-	aws: AWS,
+	athena: new athena.Athena({}),
+	s3: new s3.S3({}),
 	db: "sampledb",
 	getStats: true
 };
@@ -317,7 +307,7 @@ exports.handler = async event => {
 ######  Query to fetch results (rows) for page 1
 ```javascript
 async function main() {
-     const myQuery = {
+    const myQuery = {
         sql: "SELECT * from students LIMIT 100",
         pagination: 10
     };
