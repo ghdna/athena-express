@@ -34,7 +34,11 @@ declare module 'athena-express' {
 
     interface QueryObjectInterface {
         sql: string;
-        db: string;
+        db?: string;
+        pagination?: number;
+        NextToken?: string;
+        QueryExecutionId?: string;
+        catalog?: string;
     }
     type DirectQueryString = string;
     type QueryExecutionId = string;
