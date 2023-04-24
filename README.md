@@ -24,7 +24,7 @@ Athena-Express can simplify executing SQL queries in Amazon Athena **AND** fetch
 
 ## Amazon Athena Background
 
-[Amazon Athena](https://aws.amazon.com/athena/), launched at AWS re:Invent 2016, made it easier to analyze data in Amazon S3 using standard SQL. Under the covers, it uses [Presto](https://prestodb.io/), which is an opensource SQL engine developed by Facebook in 2012 to query their 300 Petabyte data warehouse. It's incredibly powerful!
+[Amazon Athena](https://aws.amazon.com/athena/), launched at AWS re:Invent 2016, made it easier to analyze data in Amazon S3 using standard SQL. Under the covers, it uses [Presto](https://prestodb.io/), which is an open source SQL engine developed by Facebook in 2012 to query their 300 Petabyte data warehouse. It's incredibly powerful!
 
 Amazon Athena combines the strength of Presto with serverless & self-managed capabilities of AWS. By simply pointing Athena to your data in Amazon S3, one could start querying using standard SQL. Most results are delivered within seconds and there’s no need for complex ETL jobs to prepare your data for analysis. This makes it easy for anyone with SQL skills to quickly analyze large-scale datasets.
 
@@ -42,9 +42,9 @@ And as added features
 5.	Handles specific Athena errors by recursively retrying for `ThrottlingException`, `NetworkingError`, and `TooManyRequestsException`
 6.	Provides optional helpful stats including cost per query in USD
 7.	Fetching results (rows) via Pagination OR as a continuous stream
-8.	Synchrnous and Asynchornous fetching of results (rows)
+8.	Synchronous and Asynchronous fetching of results (rows)
 
-Integrating with Amazon Athena without `athena-express` would require you to identify the appropriate API methods in the AWS SDK, stich them together sequentially, and then build out an error handling & retry mechanism for each of those methods. 
+Integrating with Amazon Athena without `athena-express` would require you to identify the appropriate API methods in the AWS SDK, stitch them together sequentially, and then build out an error handling & retry mechanism for each of those methods. 
 
 
 >`athena-express` can help you save time & effort in setting up this integration so that you can focus on core application development. 
@@ -113,7 +113,7 @@ const athenaExpress = new AthenaExpress(athenaExpressConfig);
 
 #### Advance configuration
 
-- Besides the `aws` sdk paramater that is required, you can add any of the following optional parameters below
+- Besides the `aws` sdk parameter that is required, you can add any of the following optional parameters below
 
 
 
@@ -327,7 +327,7 @@ async function main() {
 main();
 
 ```
-This will fetch the first 10 results (rows) off the 100 that exits in Athena. To query the next 10 rows, pass the values for `NextToken` and `QueryExecutionId` that were returned in the first query.
+This will fetch the first 10 results (rows) off the 100 that exist in Athena. To query the next 10 rows, pass the values for `NextToken` and `QueryExecutionId` that were returned in the first query.
 
 ###### Query to fetch results (rows) for page 2 and beyond
 ```javascript
