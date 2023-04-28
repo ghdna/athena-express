@@ -37,6 +37,7 @@ declare module 'athena-express' {
         db?: string;
         pagination?: number;
         NextToken?: string;
+        skipResults?: boolean;
         QueryExecutionId?: string;
         catalog?: string;
     }
