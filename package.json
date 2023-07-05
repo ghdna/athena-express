@@ -30,7 +30,8 @@
   },
   "homepage": "https://github.com/ghdna/athena-express#readme",
   "devDependencies": {
-    "aws-sdk": ">=2.814.0",
+    "@aws-sdk/client-athena": "^3.312.0",
+    "@aws-sdk/client-s3": "^3.312.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.11",
     "istanbul": "^0.4.5",
